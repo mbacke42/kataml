@@ -1,0 +1,157 @@
+{
+ "name": "Fuite d'information",
+ "name_en": "Information leakage",
+ "description": "Des variables de pur hasard semblent prédictives si la sélection de variables voit tout le jeu de données. Le Pipeline corrige l'évaluation.",
+ "description_en": "Pure-noise features look predictive if feature selection sees the whole dataset. The Pipeline fixes the evaluation.",
+ "nodes": [
+  {
+   "id": "d",
+   "type": "io.dataset",
+   "x": 40,
+   "y": 230,
+   "label": "Point de départ",
+   "params": {
+    "dataset": "iris"
+   }
+  },
+  {
+   "id": "s",
+   "type": "manip.python",
+   "x": 320,
+   "y": 230,
+   "label": "Données au hasard",
+   "params": {
+    "code": "import numpy as np\nrng = np.random.default_rng(0)\n# 100 lignes, 2 000 variables de pur hasard, cible au hasard.\nout = pd.DataFrame(rng.normal(size=(100, 2000)), columns=[f'x{i}' for i in range(2000)])\nout['target'] = rng.integers(0, 2, size=100)\n"
+   }
+  },
+  {
+   "id": "k",
+   "type": "sk.transformer.SelectKBest",
+   "x": 600,
+   "y": 120,
+   "label": "20 meilleures variables",
+   "params": {
+    "target": "target",
+    "k": "20"
+   }
+  },
+  {
+   "id": "m",
+   "type": "sk.classifier.LogisticRegression",
+   "x": 880,
+   "y": 120,
+   "label": "Régression logistique",
+   "params": {
+    "target": "target"
+   }
+  },
+  {
+   "id": "cv1",
+   "type": "tune.cross_validation",
+   "x": 1160,
+   "y": 120,
+   "label": "CV avec fuite",
+   "params": {}
+  },
+  {
+   "id": "p",
+   "type": "compose.pipeline",
+   "x": 1160,
+   "y": 340,
+   "label": "Pipeline (sélection + modèle)",
+   "params": {}
+  },
+  {
+   "id": "cv2",
+   "type": "tune.cross_validation",
+   "x": 1440,
+   "y": 340,
+   "label": "CV sans fuite",
+   "params": {}
+  }
+ ],
+ "edges": [
+  {
+   "from": "d",
+   "fromPort": 0,
+   "to": "s",
+   "toPort": 0
+  },
+  {
+   "from": "s",
+   "fromPort": 0,
+   "to": "k",
+   "toPort": 0
+  },
+  {
+   "from": "k",
+   "fromPort": 0,
+   "to": "m",
+   "toPort": 0
+  },
+  {
+   "from": "m",
+   "fromPort": 0,
+   "to": "cv1",
+   "toPort": 0
+  },
+  {
+   "from": "k",
+   "fromPort": 0,
+   "to": "cv1",
+   "toPort": 1
+  },
+  {
+   "from": "s",
+   "fromPort": 0,
+   "to": "p",
+   "toPort": 0
+  },
+  {
+   "from": "m",
+   "fromPort": 0,
+   "to": "p",
+   "toPort": 1
+  },
+  {
+   "from": "k",
+   "fromPort": 1,
+   "to": "p",
+   "toPort": 2
+  },
+  {
+   "from": "p",
+   "fromPort": 0,
+   "to": "cv2",
+   "toPort": 0
+  },
+  {
+   "from": "s",
+   "fromPort": 0,
+   "to": "cv2",
+   "toPort": 1
+  }
+ ],
+ "annotations": [
+  {
+   "id": "a1",
+   "x": 30,
+   "y": -10,
+   "w": 600,
+   "h": 96,
+   "text": "Fuite d'information\nLa cible est tirée au hasard : aucun modèle ne peut faire mieux que 50 %. Pourtant la « CV avec fuite » affiche bien plus. Comparez avec la « CV sans fuite ».",
+   "color": "jaune"
+  },
+  {
+   "id": "a2",
+   "x": 310,
+   "y": 440,
+   "w": 620,
+   "h": 92,
+   "text": "Pourquoi ?\nEn haut, SelectKBest a choisi ses variables en voyant toutes les lignes, y compris celles des plis de test. Dans le Pipeline, la sélection est refaite à chaque pli.",
+   "color": "vert"
+  }
+ ],
+ "version": 1,
+ "groups": []
+}

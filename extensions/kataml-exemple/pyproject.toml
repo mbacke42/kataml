@@ -1,0 +1,17 @@
+[project]
+name = "kataml-exemple"
+version = "1.0.0"
+description = "Extension d'exemple pour KataML : écrêtage des valeurs extrêmes et encodage par fréquence."
+requires-python = ">=3.10"
+dependencies = ["kataml"]
+
+# Point d'entrée lu par KataML au démarrage.
+[project.entry-points."kataml.extensions"]
+exemple = "kataml_exemple"
+
+[build-system]
+requires = ["uv_build>=0.8,<0.10"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""

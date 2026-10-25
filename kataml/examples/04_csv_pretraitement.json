@@ -1,0 +1,249 @@
+{
+ "name": "CSV : nettoyage et encodage",
+ "description": "Valeurs manquantes et variables catégorielles : imputation, one-hot et régression logistique réunies dans un Pipeline.",
+ "nodes": [
+  {
+   "id": "n1",
+   "type": "io.csv_reader",
+   "x": 40,
+   "y": 230,
+   "label": "clients.csv",
+   "params": {
+    "path": "clients.csv"
+   }
+  },
+  {
+   "id": "n2",
+   "type": "view.statistics",
+   "x": 320,
+   "y": 98.0,
+   "label": "Profil des données",
+   "params": {}
+  },
+  {
+   "id": "n3",
+   "type": "manip.partition",
+   "x": 320,
+   "y": 230,
+   "label": "Partition",
+   "params": {
+    "test_size": 0.25,
+    "stratify": "resilie",
+    "random_state": 1
+   }
+  },
+  {
+   "id": "n4",
+   "type": "sk.transformer.SimpleImputer",
+   "x": 600,
+   "y": 164.0,
+   "label": "Imputer (médiane)",
+   "params": {
+    "columns": [
+     "age",
+     "revenu",
+     "anciennete"
+    ],
+    "strategy": "median"
+   }
+  },
+  {
+   "id": "n5",
+   "type": "sk.transformer.OneHotEncoder",
+   "x": 880,
+   "y": 164.0,
+   "label": "One-hot",
+   "params": {
+    "columns": [
+     "region",
+     "offre"
+    ],
+    "handle_unknown": "ignore"
+   }
+  },
+  {
+   "id": "n6",
+   "type": "sk.transformer.StandardScaler",
+   "x": 1160,
+   "y": 164.0,
+   "label": "Normalisation",
+   "params": {
+    "target": "resilie"
+   }
+  },
+  {
+   "id": "n7",
+   "type": "sk.classifier.LogisticRegression",
+   "x": 1440,
+   "y": 164.0,
+   "label": "Régression logistique",
+   "params": {
+    "target": "resilie",
+    "max_iter": "1000",
+    "class_weight": "'balanced'"
+   }
+  },
+  {
+   "id": "p1",
+   "type": "compose.pipeline",
+   "x": 1440,
+   "y": 318.0,
+   "label": "Pipeline complet",
+   "params": {}
+  },
+  {
+   "id": "n11",
+   "type": "apply.predictor",
+   "x": 1720,
+   "y": 318.0,
+   "label": "Prédire le test",
+   "params": {}
+  },
+  {
+   "id": "n12",
+   "type": "score.classification",
+   "x": 2000,
+   "y": 252.0,
+   "label": "Évaluation",
+   "params": {}
+  },
+  {
+   "id": "n13",
+   "type": "score.roc",
+   "x": 2000,
+   "y": 384.0,
+   "label": "ROC",
+   "params": {}
+  },
+  {
+   "id": "n14",
+   "type": "tune.grid_search",
+   "x": 1720,
+   "y": 461.0,
+   "label": "Réglage de C",
+   "params": {
+    "grid": "{\n  \"model__C\": [0.01, 0.1, 1, 10]\n}",
+    "scoring": "roc_auc"
+   }
+  }
+ ],
+ "edges": [
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n2",
+   "toPort": 0
+  },
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n3",
+   "toPort": 0
+  },
+  {
+   "from": "n3",
+   "fromPort": 0,
+   "to": "n4",
+   "toPort": 0
+  },
+  {
+   "from": "n4",
+   "fromPort": 0,
+   "to": "n5",
+   "toPort": 0
+  },
+  {
+   "from": "n5",
+   "fromPort": 0,
+   "to": "n6",
+   "toPort": 0
+  },
+  {
+   "from": "n6",
+   "fromPort": 0,
+   "to": "n7",
+   "toPort": 0
+  },
+  {
+   "from": "n3",
+   "fromPort": 0,
+   "to": "p1",
+   "toPort": 0
+  },
+  {
+   "from": "n7",
+   "fromPort": 0,
+   "to": "p1",
+   "toPort": 1
+  },
+  {
+   "from": "n4",
+   "fromPort": 1,
+   "to": "p1",
+   "toPort": 2
+  },
+  {
+   "from": "n5",
+   "fromPort": 1,
+   "to": "p1",
+   "toPort": 3
+  },
+  {
+   "from": "n6",
+   "fromPort": 1,
+   "to": "p1",
+   "toPort": 4
+  },
+  {
+   "from": "p1",
+   "fromPort": 0,
+   "to": "n11",
+   "toPort": 0
+  },
+  {
+   "from": "n3",
+   "fromPort": 1,
+   "to": "n11",
+   "toPort": 1
+  },
+  {
+   "from": "n11",
+   "fromPort": 0,
+   "to": "n12",
+   "toPort": 0
+  },
+  {
+   "from": "n11",
+   "fromPort": 0,
+   "to": "n13",
+   "toPort": 0
+  },
+  {
+   "from": "p1",
+   "fromPort": 0,
+   "to": "n14",
+   "toPort": 0
+  },
+  {
+   "from": "n3",
+   "fromPort": 0,
+   "to": "n14",
+   "toPort": 1
+  }
+ ],
+ "annotations": [
+  {
+   "id": "a1",
+   "x": 30,
+   "y": -10,
+   "w": 560,
+   "h": 90,
+   "text": "Données réelles = données sales\nLes trois prétraitements et le modèle sont rassemblés dans un Pipeline appliqué aux données brutes du test.",
+   "color": "bleu"
+  }
+ ],
+ "version": 1,
+ "groups": [],
+ "name_en": "CSV: cleaning and encoding",
+ "description_en": "Missing values and categorical features: imputation, one-hot encoding and logistic regression in a Pipeline."
+}

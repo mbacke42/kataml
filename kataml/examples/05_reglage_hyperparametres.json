@@ -1,0 +1,217 @@
+{
+ "name": "Réglage d'hyperparamètres",
+ "description": "SVM sur le cancer du sein : Pipeline, recherche sur grille, courbes de validation et d'apprentissage, validation croisée imbriquée.",
+ "nodes": [
+  {
+   "id": "n1",
+   "type": "io.dataset",
+   "x": 40,
+   "y": 230,
+   "label": "Cancer du sein",
+   "params": {
+    "dataset": "breast_cancer"
+   }
+  },
+  {
+   "id": "n2",
+   "type": "sk.transformer.StandardScaler",
+   "x": 320,
+   "y": 120,
+   "label": "Normalisation",
+   "params": {
+    "target": "target"
+   }
+  },
+  {
+   "id": "n3",
+   "type": "sk.classifier.SVC",
+   "x": 600,
+   "y": 120,
+   "label": "SVM (configuration)",
+   "params": {
+    "target": "target"
+   }
+  },
+  {
+   "id": "p1",
+   "type": "compose.pipeline",
+   "x": 880,
+   "y": 230,
+   "label": "Pipeline",
+   "params": {}
+  },
+  {
+   "id": "n4",
+   "type": "tune.grid_search",
+   "x": 1160,
+   "y": 230,
+   "label": "Grille C × gamma",
+   "params": {
+    "grid": "{\n  \"model__C\": [0.1, 1, 10, 100],\n  \"model__gamma\": [\"scale\", 0.01, 0.001]\n}",
+    "cv": 5,
+    "scoring": "roc_auc"
+   }
+  },
+  {
+   "id": "n7",
+   "type": "tune.validation_curve",
+   "x": 1160,
+   "y": 98.0,
+   "label": "Courbe de validation (C)",
+   "params": {
+    "param": "model__C",
+    "values": "[0.001, 0.01, 0.1, 1, 10, 100, 1000]"
+   }
+  },
+  {
+   "id": "n5",
+   "type": "tune.learning_curve",
+   "x": 1440,
+   "y": 164.0,
+   "label": "Courbe d'apprentissage",
+   "params": {}
+  },
+  {
+   "id": "n6",
+   "type": "tune.cross_validation",
+   "x": 1440,
+   "y": 296.0,
+   "label": "CV du meilleur modèle",
+   "params": {
+    "scoring": [
+     "accuracy",
+     "roc_auc"
+    ]
+   }
+  },
+  {
+   "id": "n8",
+   "type": "tune.cross_validation",
+   "x": 1440,
+   "y": 428,
+   "label": "CV imbriquée",
+   "params": {
+    "scoring": [
+     "accuracy",
+     "roc_auc"
+    ]
+   }
+  }
+ ],
+ "edges": [
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n2",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "n3",
+   "toPort": 0
+  },
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "p1",
+   "toPort": 0
+  },
+  {
+   "from": "n3",
+   "fromPort": 0,
+   "to": "p1",
+   "toPort": 1
+  },
+  {
+   "from": "n2",
+   "fromPort": 1,
+   "to": "p1",
+   "toPort": 2
+  },
+  {
+   "from": "p1",
+   "fromPort": 0,
+   "to": "n4",
+   "toPort": 0
+  },
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n4",
+   "toPort": 1
+  },
+  {
+   "from": "p1",
+   "fromPort": 0,
+   "to": "n7",
+   "toPort": 0
+  },
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n7",
+   "toPort": 1
+  },
+  {
+   "from": "n4",
+   "fromPort": 0,
+   "to": "n5",
+   "toPort": 0
+  },
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n5",
+   "toPort": 1
+  },
+  {
+   "from": "n4",
+   "fromPort": 0,
+   "to": "n6",
+   "toPort": 0
+  },
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n6",
+   "toPort": 1
+  },
+  {
+   "from": "n4",
+   "fromPort": 2,
+   "to": "n8",
+   "toPort": 0
+  },
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n8",
+   "toPort": 1
+  }
+ ],
+ "annotations": [
+  {
+   "id": "a1",
+   "x": 30,
+   "y": -10,
+   "w": 520,
+   "h": 80,
+   "text": "Validation croisée & réglage\nLa grille vise les paramètres du Pipeline (model__C) : la normalisation est réapprise à chaque pli.",
+   "color": "bleu"
+  },
+  {
+   "id": "a2",
+   "x": 1700,
+   "y": 300,
+   "w": 330,
+   "h": 120,
+   "color": "jaune",
+   "text": "Optimiste ou imbriquée ?\n« CV du meilleur modèle » réévalue des réglages choisis sur ces mêmes plis. « CV imbriquée » refait la recherche dans chaque pli (sortie « Recherche » de la grille)."
+  }
+ ],
+ "version": 1,
+ "groups": [],
+ "name_en": "Hyperparameter tuning",
+ "description_en": "SVM on breast cancer: Pipeline, grid search, validation and learning curves, nested cross-validation."
+}

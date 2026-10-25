@@ -1,0 +1,128 @@
+{
+ "name": "Clustering : k-moyennes et ACP",
+ "description": "Générer des nuages de points, normaliser, KMeans, projection ACP.",
+ "nodes": [
+  {
+   "id": "n1",
+   "type": "io.dataset",
+   "x": 40,
+   "y": 120,
+   "label": "Blobs",
+   "params": {
+    "dataset": "make_blobs",
+    "n_samples": 500,
+    "n_features": 4,
+    "centers": 4,
+    "random_state": 3
+   }
+  },
+  {
+   "id": "n2",
+   "type": "manip.column_filter",
+   "x": 320,
+   "y": 120,
+   "label": "Sans la vérité terrain",
+   "params": {
+    "columns": [
+     "target"
+    ],
+    "mode": "exclude"
+   }
+  },
+  {
+   "id": "n3",
+   "type": "sk.transformer.StandardScaler",
+   "x": 600,
+   "y": 120,
+   "label": "Normalisation",
+   "params": {}
+  },
+  {
+   "id": "n4",
+   "type": "sk.cluster.KMeans",
+   "x": 880,
+   "y": 120,
+   "label": "k-moyennes (k=4)",
+   "params": {
+    "n_clusters": "4",
+    "n_init": "10",
+    "random_state": "0"
+   }
+  },
+  {
+   "id": "n5",
+   "type": "sk.transformer.PCA",
+   "x": 1160,
+   "y": 120,
+   "label": "ACP 2D",
+   "params": {
+    "n_components": "2",
+    "columns": [
+     "x0",
+     "x1",
+     "x2",
+     "x3"
+    ]
+   }
+  },
+  {
+   "id": "n6",
+   "type": "view.scatter",
+   "x": 1440,
+   "y": 120,
+   "label": "Clusters projetés",
+   "params": {
+    "x": "pca0",
+    "y": "pca1",
+    "color": "Cluster"
+   }
+  }
+ ],
+ "edges": [
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n2",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "n3",
+   "toPort": 0
+  },
+  {
+   "from": "n3",
+   "fromPort": 0,
+   "to": "n4",
+   "toPort": 0
+  },
+  {
+   "from": "n4",
+   "fromPort": 0,
+   "to": "n5",
+   "toPort": 0
+  },
+  {
+   "from": "n5",
+   "fromPort": 0,
+   "to": "n6",
+   "toPort": 0
+  }
+ ],
+ "annotations": [
+  {
+   "id": "a1",
+   "x": 30,
+   "y": -10,
+   "w": 480,
+   "h": 80,
+   "text": "Apprentissage non supervisé\nModifiez n_clusters dans k-moyennes et observez le score de silhouette dans la vue.",
+   "color": "rose"
+  }
+ ],
+ "version": 1,
+ "groups": [],
+ "name_en": "Clustering: k-means and PCA",
+ "description_en": "Generate blobs, scale, KMeans, PCA projection."
+}

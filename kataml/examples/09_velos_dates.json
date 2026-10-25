@@ -1,0 +1,173 @@
+{
+ "name": "Dates : locations de vélos",
+ "description": "Caractéristiques de dates (encodage cyclique), gradient boosting, dépendance partielle et importance.",
+ "nodes": [
+  {
+   "id": "n1",
+   "type": "io.csv_reader",
+   "x": 40,
+   "y": 230,
+   "label": "velos.csv",
+   "params": {
+    "path": "velos.csv"
+   }
+  },
+  {
+   "id": "n2",
+   "type": "manip.dates",
+   "x": 320,
+   "y": 230,
+   "label": "Variables de date",
+   "params": {
+    "columns": [
+     "date"
+    ],
+    "parts": [
+     "month",
+     "dayofweek",
+     "hour",
+     "is_weekend"
+    ],
+    "cyclic": true
+   }
+  },
+  {
+   "id": "n3",
+   "type": "manip.partition",
+   "x": 600,
+   "y": 230,
+   "label": "Partition",
+   "params": {
+    "test_size": 0.25,
+    "shuffle": false
+   }
+  },
+  {
+   "id": "m1",
+   "type": "sk.regressor.HistGradientBoostingRegressor",
+   "x": 880,
+   "y": 164.0,
+   "label": "Gradient boosting",
+   "params": {
+    "target": "locations",
+    "max_iter": "300",
+    "learning_rate": "0.08"
+   }
+  },
+  {
+   "id": "n4",
+   "type": "apply.predictor",
+   "x": 1160,
+   "y": 164.0,
+   "label": "Prédire",
+   "params": {}
+  },
+  {
+   "id": "n5",
+   "type": "score.regression",
+   "x": 1440,
+   "y": 164.0,
+   "label": "Scores",
+   "params": {}
+  },
+  {
+   "id": "n6",
+   "type": "explain.partial_dependence",
+   "x": 1160,
+   "y": 296.0,
+   "label": "Effet heure / température",
+   "params": {
+    "features": [
+     "date_hour",
+     "temperature",
+     "humidite"
+    ]
+   }
+  },
+  {
+   "id": "n7",
+   "type": "score.importance",
+   "x": 1440,
+   "y": 296.0,
+   "label": "Importance",
+   "params": {}
+  }
+ ],
+ "edges": [
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n2",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "n3",
+   "toPort": 0
+  },
+  {
+   "from": "n3",
+   "fromPort": 0,
+   "to": "m1",
+   "toPort": 0
+  },
+  {
+   "from": "m1",
+   "fromPort": 0,
+   "to": "n4",
+   "toPort": 0
+  },
+  {
+   "from": "n3",
+   "fromPort": 1,
+   "to": "n4",
+   "toPort": 1
+  },
+  {
+   "from": "n4",
+   "fromPort": 0,
+   "to": "n5",
+   "toPort": 0
+  },
+  {
+   "from": "m1",
+   "fromPort": 0,
+   "to": "n6",
+   "toPort": 0
+  },
+  {
+   "from": "n3",
+   "fromPort": 1,
+   "to": "n6",
+   "toPort": 1
+  },
+  {
+   "from": "m1",
+   "fromPort": 0,
+   "to": "n7",
+   "toPort": 0
+  },
+  {
+   "from": "n3",
+   "fromPort": 1,
+   "to": "n7",
+   "toPort": 1
+  }
+ ],
+ "annotations": [
+  {
+   "id": "a1",
+   "x": 30,
+   "y": -10,
+   "w": 560,
+   "h": 92,
+   "text": "Variables temporelles\nLe partitionnement sans mélange garde la fin de la période pour le test. L'encodage cyclique relie 23 h à minuit.",
+   "color": "jaune"
+  }
+ ],
+ "version": 1,
+ "groups": [],
+ "name_en": "Dates: bike rentals",
+ "description_en": "Date features (cyclic encoding), gradient boosting, partial dependence and importance."
+}

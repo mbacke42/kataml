@@ -1,0 +1,42 @@
+.venv/
+__pycache__/
+*.pyc
+workspace/
+# Réglages locaux de Claude Code ignorés ; les skills du projet sont publiées.
+.claude/*
+!.claude/skills/
+dist/
+build/
+.build-cache/
+# Documentation : fichiers générés (captures, référence des nœuds, site)
+docs/assets/screenshots/
+docs/*/reference/
+public/
+
+# --- Ajouts du fork ---
+# Fichiers système et caches
+.DS_Store
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+*.log
+# Secrets : ne jamais publier de mots de passe ni d'URL de base de données
+.env
+.env.*
+*secrets*.toml
+# Données (gardées en local, souvent volumineuses ou privées)
+*.parquet
+*.db
+*.sqlite
+*.sqlite3
+*.xlsx
+*.xls
+# Fichiers intermédiaires de LaTeX (le .tex et le .pdf du rapport sont publiés)
+rapport/*.aux
+rapport/*.log
+rapport/*.out
+rapport/*.toc
+rapport/*.fls
+rapport/*.fdb_latexmk
+rapport/*.xdv
+rapport/*.synctex.gz

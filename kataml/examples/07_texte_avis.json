@@ -1,0 +1,215 @@
+{
+ "name": "Texte : classer des avis",
+ "description": "Vectorisation TF-IDF d'avis clients, régression logistique et bayésien naïf dans des Pipelines, comparés en validation croisée.",
+ "nodes": [
+  {
+   "id": "n1",
+   "type": "io.csv_reader",
+   "x": 40,
+   "y": 230,
+   "label": "avis.csv",
+   "params": {
+    "path": "avis.csv"
+   }
+  },
+  {
+   "id": "n2",
+   "type": "manip.partition",
+   "x": 320,
+   "y": 230,
+   "label": "Partition",
+   "params": {
+    "test_size": 0.25,
+    "stratify": "sentiment",
+    "random_state": 0
+   }
+  },
+  {
+   "id": "v1",
+   "type": "text.TfidfVectorizer",
+   "x": 600,
+   "y": 153.0,
+   "label": "TF-IDF",
+   "params": {
+    "column": "avis",
+    "ngram_range": "(1, 2)",
+    "min_df": "2",
+    "max_features": "2000"
+   }
+  },
+  {
+   "id": "m1",
+   "type": "sk.classifier.LogisticRegression",
+   "x": 880,
+   "y": 98.0,
+   "label": "Régression logistique",
+   "params": {
+    "target": "sentiment",
+    "max_iter": "1000"
+   }
+  },
+  {
+   "id": "m2",
+   "type": "sk.classifier.MultinomialNB",
+   "x": 880,
+   "y": 208.0,
+   "label": "Bayésien naïf",
+   "params": {
+    "target": "sentiment"
+   }
+  },
+  {
+   "id": "p1",
+   "type": "compose.pipeline",
+   "x": 1160,
+   "y": 120,
+   "label": "Pipeline LR",
+   "params": {}
+  },
+  {
+   "id": "p2",
+   "type": "compose.pipeline",
+   "x": 1160,
+   "y": 252.0,
+   "label": "Pipeline NB",
+   "params": {}
+  },
+  {
+   "id": "c1",
+   "type": "tune.compare",
+   "x": 1440,
+   "y": 186.0,
+   "label": "Comparaison (CV)",
+   "params": {}
+  },
+  {
+   "id": "n3",
+   "type": "apply.predictor",
+   "x": 1440,
+   "y": 318.0,
+   "label": "Prédire le test",
+   "params": {}
+  },
+  {
+   "id": "n4",
+   "type": "score.classification",
+   "x": 1720,
+   "y": 318.0,
+   "label": "Évaluation",
+   "params": {}
+  }
+ ],
+ "edges": [
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n2",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "v1",
+   "toPort": 0
+  },
+  {
+   "from": "v1",
+   "fromPort": 0,
+   "to": "m1",
+   "toPort": 0
+  },
+  {
+   "from": "v1",
+   "fromPort": 0,
+   "to": "m2",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "p1",
+   "toPort": 0
+  },
+  {
+   "from": "m1",
+   "fromPort": 0,
+   "to": "p1",
+   "toPort": 1
+  },
+  {
+   "from": "v1",
+   "fromPort": 1,
+   "to": "p1",
+   "toPort": 2
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "p2",
+   "toPort": 0
+  },
+  {
+   "from": "m2",
+   "fromPort": 0,
+   "to": "p2",
+   "toPort": 1
+  },
+  {
+   "from": "v1",
+   "fromPort": 1,
+   "to": "p2",
+   "toPort": 2
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "c1",
+   "toPort": 0
+  },
+  {
+   "from": "p1",
+   "fromPort": 0,
+   "to": "c1",
+   "toPort": 1
+  },
+  {
+   "from": "p2",
+   "fromPort": 0,
+   "to": "c1",
+   "toPort": 2
+  },
+  {
+   "from": "p1",
+   "fromPort": 0,
+   "to": "n3",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 1,
+   "to": "n3",
+   "toPort": 1
+  },
+  {
+   "from": "n3",
+   "fromPort": 0,
+   "to": "n4",
+   "toPort": 0
+  }
+ ],
+ "annotations": [
+  {
+   "id": "a1",
+   "x": 30,
+   "y": -10,
+   "w": 520,
+   "h": 92,
+   "text": "Traitement du langage\nChaque avis devient un vecteur de fréquences de mots (TF-IDF). Le vocabulaire est appris dans le Pipeline, donc à chaque pli.",
+   "color": "vert"
+  }
+ ],
+ "version": 1,
+ "groups": [],
+ "name_en": "Text: classifying reviews",
+ "description_en": "TF-IDF vectorisation of customer reviews, logistic regression and naive Bayes in Pipelines, compared by cross-validation."
+}

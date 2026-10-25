@@ -1,0 +1,113 @@
+# Intégration continue de KataML.
+# - tests : à chaque push et merge request ;
+# - versions portables (AppImage Linux, zip Windows) et release GitLab : sur un tag vX.Y.Z ;
+# - documentation (GitLab Pages) : sur la branche par défaut et les tags de version.
+
+stages: [test, build, release, deploy]
+
+default:
+  image: ghcr.io/astral-sh/uv:python3.13-bookworm-slim
+
+variables:
+  UV_CACHE_DIR: "$CI_PROJECT_DIR/.uv-cache"
+  UV_LINK_MODE: copy
+
+.on-release-tag:
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
+
+tests:
+  stage: test
+  cache:
+    key: uv-tests
+    paths: [.uv-cache]
+  script:
+    - uv run python -m unittest discover -v tests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+portable:
+  stage: build
+  extends: .on-release-tag
+  cache:
+    key: build-portable
+    paths: [.uv-cache, .build-cache]
+  script:
+    # Le tag doit correspondre à la version déclarée dans pyproject.toml.
+    - VERSION="${CI_COMMIT_TAG#v}"
+    - grep -q "^version = \"$VERSION\"" pyproject.toml || { echo "Le tag $CI_COMMIT_TAG ne correspond pas à pyproject.toml"; exit 1; }
+    - apt-get update -qq && apt-get install -y -qq --no-install-recommends file > /dev/null
+    - uv run --no-project python tools/build_portable.py --smoke-test
+    - echo "VERSION=$VERSION" > release.env
+  artifacts:
+    paths: [dist/]
+    reports:
+      dotenv: release.env
+    expire_in: 1 week
+
+publish:
+  stage: release
+  extends: .on-release-tag
+  image: curlimages/curl:latest
+  needs: [portable]
+  script:
+    - |
+      for f in dist/*; do
+        echo "Envoi de $(basename "$f")"
+        curl --fail --silent --show-error --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "$f" \
+          "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/kataml/${VERSION}/$(basename "$f")"
+      done
+
+release:
+  stage: release
+  extends: .on-release-tag
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  needs: [portable, publish]
+  script:
+    - echo "Création de la release $CI_COMMIT_TAG"
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: "KataML $VERSION"
+    description: |
+      ## Téléchargements
+
+      Versions portables : aucune installation ni droits administrateur, Python et scikit-learn inclus.
+
+      - **Linux** : `KataML-$VERSION-x86_64.AppImage`. Rendez-le exécutable (`chmod +x`) puis lancez-le.
+        Les données sont rangées dans `kataml-workspace/`, à côté du fichier.
+      - **Windows** : `KataML-$VERSION-windows-x64.zip`. Dézippez, puis double-cliquez sur `KataML.bat`.
+        Les données sont rangées dans le dossier `workspace/`.
+
+      Avec uv : `uv tool install git+https://gitlab.com/fredbl/kataml.git@$CI_COMMIT_TAG`
+    assets:
+      links:
+        - name: "Linux x86_64 (AppImage)"
+          url: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/kataml/${VERSION}/KataML-${VERSION}-x86_64.AppImage"
+          filepath: "/KataML-x86_64.AppImage"
+          link_type: package
+        - name: "Windows x64 (zip portable)"
+          url: "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/kataml/${VERSION}/KataML-${VERSION}-windows-x64.zip"
+          filepath: "/KataML-windows-x64.zip"
+          link_type: package
+
+pages:
+  stage: deploy
+  cache:
+    key: docs
+    paths: [.uv-cache, .build-cache/ms-playwright]
+  variables:
+    PLAYWRIGHT_BROWSERS_PATH: "$CI_PROJECT_DIR/.build-cache/ms-playwright"
+  script:
+    # Référence des nœuds (générée depuis scikit-learn) et captures d'écran automatiques.
+    - uv sync --group docs
+    - uv run --group docs playwright install --with-deps chromium
+    - uv run --group docs python tools/gen_docs.py
+    - uv run --group docs python tools/screenshots.py
+    - uv run --group docs mkdocs build --strict
+  artifacts:
+    paths: [public]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/

@@ -1,0 +1,213 @@
+{
+ "name": "Ensembles : vote et empilement",
+ "description": "Trois modèles combinés par vote et par stacking, comparés à leurs composants.",
+ "nodes": [
+  {
+   "id": "n1",
+   "type": "io.dataset",
+   "x": 40,
+   "y": 285.0,
+   "label": "Vins",
+   "params": {
+    "dataset": "wine"
+   }
+  },
+  {
+   "id": "n2",
+   "type": "sk.transformer.StandardScaler",
+   "x": 320,
+   "y": 285.0,
+   "label": "Normalisation",
+   "params": {
+    "target": "target"
+   }
+  },
+  {
+   "id": "m1",
+   "type": "sk.classifier.LogisticRegression",
+   "x": 600,
+   "y": 120,
+   "label": "Logistique",
+   "params": {
+    "target": "target",
+    "max_iter": "1000"
+   }
+  },
+  {
+   "id": "m2",
+   "type": "sk.classifier.RandomForestClassifier",
+   "x": 600,
+   "y": 230,
+   "label": "Forêt",
+   "params": {
+    "target": "target",
+    "n_estimators": "200",
+    "random_state": "0"
+   }
+  },
+  {
+   "id": "m3",
+   "type": "sk.classifier.KNeighborsClassifier",
+   "x": 600,
+   "y": 340,
+   "label": "7 voisins",
+   "params": {
+    "target": "target",
+    "n_neighbors": "7"
+   }
+  },
+  {
+   "id": "e1",
+   "type": "meta.VotingClassifier",
+   "x": 880,
+   "y": 175.0,
+   "label": "Vote souple",
+   "params": {
+    "voting": "soft"
+   }
+  },
+  {
+   "id": "e2",
+   "type": "meta.StackingClassifier",
+   "x": 880,
+   "y": 395.0,
+   "label": "Empilement",
+   "params": {}
+  },
+  {
+   "id": "c1",
+   "type": "tune.compare",
+   "x": 1160,
+   "y": 285.0,
+   "label": "Comparaison (CV)",
+   "params": {
+    "cv": 10
+   }
+  }
+ ],
+ "edges": [
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n2",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "m1",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "m2",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "m3",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "e1",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "e2",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "c1",
+   "toPort": 0
+  },
+  {
+   "from": "m1",
+   "fromPort": 0,
+   "to": "e1",
+   "toPort": 1
+  },
+  {
+   "from": "m2",
+   "fromPort": 0,
+   "to": "e1",
+   "toPort": 2
+  },
+  {
+   "from": "m3",
+   "fromPort": 0,
+   "to": "e1",
+   "toPort": 3
+  },
+  {
+   "from": "m1",
+   "fromPort": 0,
+   "to": "e2",
+   "toPort": 1
+  },
+  {
+   "from": "m2",
+   "fromPort": 0,
+   "to": "e2",
+   "toPort": 2
+  },
+  {
+   "from": "m3",
+   "fromPort": 0,
+   "to": "e2",
+   "toPort": 3
+  },
+  {
+   "from": "m1",
+   "fromPort": 0,
+   "to": "c1",
+   "toPort": 1
+  },
+  {
+   "from": "m2",
+   "fromPort": 0,
+   "to": "c1",
+   "toPort": 2
+  },
+  {
+   "from": "m3",
+   "fromPort": 0,
+   "to": "c1",
+   "toPort": 3
+  },
+  {
+   "from": "e1",
+   "fromPort": 0,
+   "to": "c1",
+   "toPort": 4
+  },
+  {
+   "from": "e2",
+   "fromPort": 0,
+   "to": "c1",
+   "toPort": 5
+  }
+ ],
+ "annotations": [
+  {
+   "id": "a1",
+   "x": 30,
+   "y": -10,
+   "w": 520,
+   "h": 80,
+   "text": "Méta-estimateurs\nLe vote et le stacking reprennent les réglages des modèles branchés et les réentraînent ensemble.",
+   "color": "bleu"
+  }
+ ],
+ "version": 1,
+ "groups": [],
+ "name_en": "Ensembles: voting and stacking",
+ "description_en": "Three models combined by voting and stacking, compared with their components."
+}

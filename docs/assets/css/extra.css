@@ -1,0 +1,19 @@
+.md-typeset img.shot { border: 1px solid #ddd; border-radius: 8px; }
+
+/* Couleur principale de KataML (sarcelle), identique à l'interface et au logo. */
+[data-md-color-primary="custom"] {
+  --md-primary-fg-color: #0f766e;
+  --md-primary-fg-color--light: #0d9488;
+  --md-primary-fg-color--dark: #0b5e57;
+  --md-primary-bg-color: #fff;
+  --md-primary-bg-color--light: rgba(255, 255, 255, .7);
+}
+[data-md-color-accent="custom"] {
+  --md-accent-fg-color: #0d9488;
+  --md-accent-fg-color--transparent: rgba(13, 148, 136, .1);
+  --md-accent-bg-color: #fff;
+}
+/* Mode sombre : liens plus lumineux, comme --accent dans l'interface. */
+[data-md-color-scheme="slate"][data-md-color-primary="custom"] {
+  --md-typeset-a-color: #2dd4bf;
+}

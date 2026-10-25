@@ -1,0 +1,191 @@
+{
+ "name": "Comprendre un modèle",
+ "name_en": "Understanding a model",
+ "description": "Forêt aléatoire sur le cancer du sein : importance par permutation, dépendance partielle, arbre dessiné et frontière de décision.",
+ "description_en": "Random forest on breast cancer: permutation importance, partial dependence, tree plot and decision boundary.",
+ "nodes": [
+  {
+   "id": "d",
+   "type": "io.dataset",
+   "x": 40,
+   "y": 230,
+   "label": "Cancer du sein",
+   "params": {
+    "dataset": "breast_cancer"
+   }
+  },
+  {
+   "id": "p",
+   "type": "manip.partition",
+   "x": 320,
+   "y": 230,
+   "label": "Partition",
+   "params": {
+    "test_size": 0.25,
+    "stratify": "target",
+    "random_state": 0
+   }
+  },
+  {
+   "id": "m",
+   "type": "sk.classifier.RandomForestClassifier",
+   "x": 600,
+   "y": 230,
+   "label": "Forêt aléatoire",
+   "params": {
+    "target": "target",
+    "n_estimators": "200",
+    "random_state": "0"
+   }
+  },
+  {
+   "id": "pr",
+   "type": "apply.predictor",
+   "x": 880,
+   "y": 230,
+   "label": "Prédire le test",
+   "params": {}
+  },
+  {
+   "id": "sc",
+   "type": "score.classification",
+   "x": 1160,
+   "y": 230,
+   "label": "Évaluation",
+   "params": {}
+  },
+  {
+   "id": "im",
+   "type": "score.importance",
+   "x": 880,
+   "y": 98.0,
+   "label": "Importance (test)",
+   "params": {
+    "n_repeats": 10
+   }
+  },
+  {
+   "id": "pd",
+   "type": "explain.partial_dependence",
+   "x": 1160,
+   "y": 98.0,
+   "label": "Dépendance partielle",
+   "params": {
+    "features": [
+     "worst area",
+     "worst concave points",
+     "mean texture"
+    ]
+   }
+  },
+  {
+   "id": "tr",
+   "type": "explain.tree",
+   "x": 880,
+   "y": 373.0,
+   "label": "Un arbre de la forêt",
+   "params": {
+    "max_depth": 3,
+    "tree_index": 0
+   }
+  },
+  {
+   "id": "db",
+   "type": "explain.decision_boundary",
+   "x": 1160,
+   "y": 373.0,
+   "label": "Frontière (2 variables)",
+   "params": {
+    "x": "worst area",
+    "y": "worst concave points"
+   }
+  }
+ ],
+ "edges": [
+  {
+   "from": "d",
+   "fromPort": 0,
+   "to": "p",
+   "toPort": 0
+  },
+  {
+   "from": "p",
+   "fromPort": 0,
+   "to": "m",
+   "toPort": 0
+  },
+  {
+   "from": "m",
+   "fromPort": 0,
+   "to": "pr",
+   "toPort": 0
+  },
+  {
+   "from": "p",
+   "fromPort": 1,
+   "to": "pr",
+   "toPort": 1
+  },
+  {
+   "from": "pr",
+   "fromPort": 0,
+   "to": "sc",
+   "toPort": 0
+  },
+  {
+   "from": "m",
+   "fromPort": 0,
+   "to": "im",
+   "toPort": 0
+  },
+  {
+   "from": "p",
+   "fromPort": 1,
+   "to": "im",
+   "toPort": 1
+  },
+  {
+   "from": "m",
+   "fromPort": 0,
+   "to": "pd",
+   "toPort": 0
+  },
+  {
+   "from": "p",
+   "fromPort": 1,
+   "to": "pd",
+   "toPort": 1
+  },
+  {
+   "from": "m",
+   "fromPort": 0,
+   "to": "tr",
+   "toPort": 0
+  },
+  {
+   "from": "m",
+   "fromPort": 0,
+   "to": "db",
+   "toPort": 0
+  },
+  {
+   "from": "p",
+   "fromPort": 1,
+   "to": "db",
+   "toPort": 1
+  }
+ ],
+ "annotations": [
+  {
+   "id": "a1",
+   "x": 30,
+   "y": -10,
+   "w": 560,
+   "h": 92,
+   "text": "Ouvrir la boîte noire\nQuelles variables comptent ? Comment influencent-elles la prédiction ? Chaque nœud d'inspection répond à une question.",
+   "color": "vert"
+  }
+ ],
+ "version": 1,
+ "groups": []
+}

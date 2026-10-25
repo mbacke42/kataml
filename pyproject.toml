@@ -1,0 +1,35 @@
+[project]
+name = "kataml"
+version = "0.5.8"
+description = "Keen-edged Analytics Toolkit for Applied Machine Learning. Workflows de machine learning visuels fondés sur scikit-learn."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "scikit-learn>=1.4",
+    "pandas>=2.0",
+    "pyarrow>=14",
+    "openpyxl>=3.1",
+]
+
+[dependency-groups]
+# Documentation (site MkDocs bilingue, captures d'écran automatiques) : uv run --group docs …
+docs = [
+    "mkdocs-material>=9.5",
+    "mkdocs-static-i18n>=1.2",
+    "playwright>=1.45",
+]
+
+[project.scripts]
+kataml = "kataml.__main__:main"
+
+[project.urls]
+Repository = "https://gitlab.com/fredbl/kataml"
+
+[build-system]
+requires = ["uv_build>=0.8,<0.10"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+# Le paquet est à la racine (pas de dossier src/) ; static/ et examples/ sont embarqués.
+module-root = ""

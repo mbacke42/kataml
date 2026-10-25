@@ -1,0 +1,181 @@
+{
+ "name": "Non supervisé : clusters et anomalies",
+ "name_en": "Unsupervised: clusters and outliers",
+ "description": "k-moyennes, mélange gaussien, projection ACP et détection d'anomalies (IsolationForest) sur des données générées.",
+ "description_en": "k-means, Gaussian mixture, PCA projection and outlier detection (IsolationForest) on generated data.",
+ "nodes": [
+  {
+   "id": "d",
+   "type": "io.dataset",
+   "x": 40,
+   "y": 230,
+   "label": "Nuages de points",
+   "params": {
+    "dataset": "make_blobs",
+    "n_samples": 600,
+    "n_features": 4,
+    "centers": 4,
+    "random_state": 7
+   }
+  },
+  {
+   "id": "f",
+   "type": "manip.column_filter",
+   "x": 320,
+   "y": 230,
+   "label": "Sans la vérité terrain",
+   "params": {
+    "columns": [
+     "target"
+    ],
+    "mode": "exclude"
+   }
+  },
+  {
+   "id": "s",
+   "type": "sk.transformer.StandardScaler",
+   "x": 600,
+   "y": 230,
+   "label": "Normalisation",
+   "params": {}
+  },
+  {
+   "id": "k",
+   "type": "sk.cluster.KMeans",
+   "x": 880,
+   "y": 120,
+   "label": "k-moyennes",
+   "params": {
+    "n_clusters": "4",
+    "n_init": "10",
+    "random_state": "0"
+   }
+  },
+  {
+   "id": "g",
+   "type": "sk.cluster.GaussianMixture",
+   "x": 880,
+   "y": 230,
+   "label": "Mélange gaussien",
+   "params": {
+    "n_components": "4",
+    "random_state": "0",
+    "label_column": "Composante"
+   }
+  },
+  {
+   "id": "i",
+   "type": "sk.outlier.IsolationForest",
+   "x": 880,
+   "y": 340,
+   "label": "Forêt d'isolement",
+   "params": {
+    "contamination": "0.03",
+    "random_state": "0"
+   }
+  },
+  {
+   "id": "p",
+   "type": "sk.transformer.PCA",
+   "x": 1160,
+   "y": 120,
+   "label": "ACP 2D",
+   "params": {
+    "n_components": "2",
+    "columns": [
+     "x0",
+     "x1",
+     "x2",
+     "x3"
+    ]
+   }
+  },
+  {
+   "id": "v",
+   "type": "view.scatter",
+   "x": 1440,
+   "y": 120,
+   "label": "Clusters projetés",
+   "params": {
+    "x": "pca0",
+    "y": "pca1",
+    "color": "Cluster"
+   }
+  },
+  {
+   "id": "v2",
+   "type": "view.scatter",
+   "x": 1160,
+   "y": 340,
+   "label": "Anomalies",
+   "params": {
+    "x": "x0",
+    "y": "x1",
+    "color": "Anomalie"
+   }
+  }
+ ],
+ "edges": [
+  {
+   "from": "d",
+   "fromPort": 0,
+   "to": "f",
+   "toPort": 0
+  },
+  {
+   "from": "f",
+   "fromPort": 0,
+   "to": "s",
+   "toPort": 0
+  },
+  {
+   "from": "s",
+   "fromPort": 0,
+   "to": "k",
+   "toPort": 0
+  },
+  {
+   "from": "s",
+   "fromPort": 0,
+   "to": "g",
+   "toPort": 0
+  },
+  {
+   "from": "s",
+   "fromPort": 0,
+   "to": "i",
+   "toPort": 0
+  },
+  {
+   "from": "k",
+   "fromPort": 0,
+   "to": "p",
+   "toPort": 0
+  },
+  {
+   "from": "p",
+   "fromPort": 0,
+   "to": "v",
+   "toPort": 0
+  },
+  {
+   "from": "i",
+   "fromPort": 0,
+   "to": "v2",
+   "toPort": 0
+  }
+ ],
+ "annotations": [
+  {
+   "id": "a1",
+   "x": 30,
+   "y": -10,
+   "w": 560,
+   "h": 92,
+   "text": "Apprentissage non supervisé\nPas de cible : on cherche des groupes (clusters) et des points atypiques (anomalies). Comparez k-moyennes et mélange gaussien.",
+   "color": "rose"
+  }
+ ],
+ "version": 1,
+ "groups": []
+}

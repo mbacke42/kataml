@@ -1,0 +1,207 @@
+{
+ "name": "Régression : diabète",
+ "description": "Ridge contre gradient boosting, comparaison en validation croisée, importance et dépendance partielle.",
+ "nodes": [
+  {
+   "id": "n1",
+   "type": "io.dataset",
+   "x": 40,
+   "y": 230,
+   "label": "Diabète",
+   "params": {
+    "dataset": "diabetes"
+   }
+  },
+  {
+   "id": "n2",
+   "type": "view.correlation",
+   "x": 320,
+   "y": 98.0,
+   "label": "Corrélations",
+   "params": {}
+  },
+  {
+   "id": "n3",
+   "type": "manip.partition",
+   "x": 320,
+   "y": 230,
+   "label": "Partition",
+   "params": {
+    "test_size": 0.2,
+    "random_state": 0
+   }
+  },
+  {
+   "id": "n4",
+   "type": "sk.regressor.Ridge",
+   "x": 600,
+   "y": 164.0,
+   "label": "Ridge",
+   "params": {
+    "target": "target",
+    "alpha": "1.0"
+   }
+  },
+  {
+   "id": "n5",
+   "type": "sk.regressor.HistGradientBoostingRegressor",
+   "x": 600,
+   "y": 296.0,
+   "label": "Gradient boosting",
+   "params": {
+    "target": "target",
+    "max_iter": "150",
+    "learning_rate": "0.05",
+    "max_depth": "3",
+    "min_samples_leaf": "20"
+   }
+  },
+  {
+   "id": "n6",
+   "type": "tune.compare",
+   "x": 880,
+   "y": 98.0,
+   "label": "Comparaison (CV)",
+   "params": {}
+  },
+  {
+   "id": "n7",
+   "type": "apply.predictor",
+   "x": 880,
+   "y": 230,
+   "label": "Prédiction GB",
+   "params": {}
+  },
+  {
+   "id": "n8",
+   "type": "score.regression",
+   "x": 1160,
+   "y": 230,
+   "label": "Scores GB",
+   "params": {}
+  },
+  {
+   "id": "n9",
+   "type": "score.importance",
+   "x": 880,
+   "y": 373.0,
+   "label": "Importance (permutation)",
+   "params": {}
+  },
+  {
+   "id": "n10",
+   "type": "explain.partial_dependence",
+   "x": 1160,
+   "y": 373.0,
+   "label": "Dépendance partielle",
+   "params": {
+    "features": [
+     "bmi",
+     "s5",
+     "bp"
+    ]
+   }
+  }
+ ],
+ "edges": [
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n2",
+   "toPort": 0
+  },
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n3",
+   "toPort": 0
+  },
+  {
+   "from": "n3",
+   "fromPort": 0,
+   "to": "n4",
+   "toPort": 0
+  },
+  {
+   "from": "n3",
+   "fromPort": 0,
+   "to": "n5",
+   "toPort": 0
+  },
+  {
+   "from": "n3",
+   "fromPort": 0,
+   "to": "n6",
+   "toPort": 0
+  },
+  {
+   "from": "n4",
+   "fromPort": 0,
+   "to": "n6",
+   "toPort": 1
+  },
+  {
+   "from": "n5",
+   "fromPort": 0,
+   "to": "n6",
+   "toPort": 2
+  },
+  {
+   "from": "n5",
+   "fromPort": 0,
+   "to": "n7",
+   "toPort": 0
+  },
+  {
+   "from": "n3",
+   "fromPort": 1,
+   "to": "n7",
+   "toPort": 1
+  },
+  {
+   "from": "n7",
+   "fromPort": 0,
+   "to": "n8",
+   "toPort": 0
+  },
+  {
+   "from": "n5",
+   "fromPort": 0,
+   "to": "n9",
+   "toPort": 0
+  },
+  {
+   "from": "n3",
+   "fromPort": 1,
+   "to": "n9",
+   "toPort": 1
+  },
+  {
+   "from": "n5",
+   "fromPort": 0,
+   "to": "n10",
+   "toPort": 0
+  },
+  {
+   "from": "n3",
+   "fromPort": 1,
+   "to": "n10",
+   "toPort": 1
+  }
+ ],
+ "annotations": [
+  {
+   "id": "a1",
+   "x": 30,
+   "y": -10,
+   "w": 480,
+   "h": 80,
+   "text": "Régression\nLe comparateur évalue les deux modèles sur les mêmes plis de validation croisée.",
+   "color": "bleu"
+  }
+ ],
+ "version": 1,
+ "groups": [],
+ "name_en": "Regression: diabetes",
+ "description_en": "Ridge versus gradient boosting, cross-validated comparison, importance and partial dependence."
+}

@@ -1,0 +1,270 @@
+{
+ "name": "Classification des iris",
+ "description": "Partition, Pipeline (normalisation + forêt aléatoire), évaluation, validation croisée et rapport avec blocs de texte.",
+ "nodes": [
+  {
+   "id": "t1",
+   "type": "report.text",
+   "x": -240,
+   "y": 230,
+   "label": "Introduction",
+   "params": {
+    "title": "Introduction",
+    "text": "## Objectif\n\nPrédire l'espèce d'un iris (*setosa*, *versicolor*, *virginica*) à partir de quatre mesures de la fleur.\n\n- 150 fleurs, 50 par espèce ;\n- 75 % des données pour l'apprentissage, 25 % pour le test ;\n- modèle : forêt aléatoire précédée d'une normalisation, réunies dans un **Pipeline**."
+   }
+  },
+  {
+   "id": "n1",
+   "type": "io.dataset",
+   "x": 40,
+   "y": 230,
+   "label": "Iris",
+   "params": {
+    "dataset": "iris"
+   }
+  },
+  {
+   "id": "n2",
+   "type": "view.statistics",
+   "x": 320,
+   "y": 10,
+   "label": "Exploration",
+   "params": {}
+  },
+  {
+   "id": "n3",
+   "type": "view.scatter",
+   "x": 320,
+   "y": 120,
+   "label": "Pétales",
+   "params": {
+    "x": "petal length (cm)",
+    "y": "petal width (cm)",
+    "color": "species"
+   }
+  },
+  {
+   "id": "n4",
+   "type": "manip.partition",
+   "x": 320,
+   "y": 285.0,
+   "label": "75 % / 25 %",
+   "params": {
+    "test_size": 0.25,
+    "stratify": "species",
+    "random_state": 42
+   }
+  },
+  {
+   "id": "n5",
+   "type": "sk.transformer.StandardScaler",
+   "x": 600,
+   "y": 230,
+   "label": "Normalisation",
+   "params": {
+    "target": "species"
+   }
+  },
+  {
+   "id": "n7",
+   "type": "sk.classifier.RandomForestClassifier",
+   "x": 880,
+   "y": 230,
+   "label": "Forêt aléatoire",
+   "params": {
+    "target": "species",
+    "n_estimators": "200",
+    "random_state": "0"
+   }
+  },
+  {
+   "id": "p1",
+   "type": "compose.pipeline",
+   "x": 1160,
+   "y": 340,
+   "label": "Pipeline",
+   "params": {}
+  },
+  {
+   "id": "n8",
+   "type": "apply.predictor",
+   "x": 1440,
+   "y": 340,
+   "label": "Prédire le test",
+   "params": {}
+  },
+  {
+   "id": "n9",
+   "type": "score.classification",
+   "x": 1720,
+   "y": 285.0,
+   "label": "Évaluation",
+   "params": {}
+  },
+  {
+   "id": "n10",
+   "type": "score.roc",
+   "x": 1720,
+   "y": 395.0,
+   "label": "ROC",
+   "params": {}
+  },
+  {
+   "id": "n11",
+   "type": "tune.cross_validation",
+   "x": 1440,
+   "y": 483.0,
+   "label": "CV 5 plis",
+   "params": {
+    "scoring": [
+     "accuracy",
+     "f1_macro"
+    ]
+   }
+  },
+  {
+   "id": "n12",
+   "type": "explain.decision_boundary",
+   "x": 1440,
+   "y": 186.0,
+   "label": "Frontière",
+   "params": {
+    "x": "petal length (cm)",
+    "y": "petal width (cm)"
+   }
+  },
+  {
+   "id": "t2",
+   "type": "report.text",
+   "x": 2000,
+   "y": 230,
+   "label": "Conclusion",
+   "params": {
+    "title": "Conclusion",
+    "text": "## À interpréter\n\n- La matrice de confusion montre les espèces confondues (versicolor et virginica).\n- La validation croisée sur le **Pipeline** donne une estimation sans fuite d'information.\n- La frontière de décision illustre le rôle des mesures des pétales.\n\n> Générez le rapport avec le bouton « Rapport » (Ctrl+P)."
+   }
+  }
+ ],
+ "edges": [
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n2",
+   "toPort": 0
+  },
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n3",
+   "toPort": 0
+  },
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n4",
+   "toPort": 0
+  },
+  {
+   "from": "n4",
+   "fromPort": 0,
+   "to": "n5",
+   "toPort": 0
+  },
+  {
+   "from": "n5",
+   "fromPort": 0,
+   "to": "n7",
+   "toPort": 0
+  },
+  {
+   "from": "n4",
+   "fromPort": 0,
+   "to": "p1",
+   "toPort": 0
+  },
+  {
+   "from": "n7",
+   "fromPort": 0,
+   "to": "p1",
+   "toPort": 1
+  },
+  {
+   "from": "n5",
+   "fromPort": 1,
+   "to": "p1",
+   "toPort": 2
+  },
+  {
+   "from": "p1",
+   "fromPort": 0,
+   "to": "n8",
+   "toPort": 0
+  },
+  {
+   "from": "n4",
+   "fromPort": 1,
+   "to": "n8",
+   "toPort": 1
+  },
+  {
+   "from": "n8",
+   "fromPort": 0,
+   "to": "n9",
+   "toPort": 0
+  },
+  {
+   "from": "n8",
+   "fromPort": 0,
+   "to": "n10",
+   "toPort": 0
+  },
+  {
+   "from": "p1",
+   "fromPort": 0,
+   "to": "n11",
+   "toPort": 0
+  },
+  {
+   "from": "n4",
+   "fromPort": 0,
+   "to": "n11",
+   "toPort": 1
+  },
+  {
+   "from": "p1",
+   "fromPort": 0,
+   "to": "n12",
+   "toPort": 0
+  },
+  {
+   "from": "n4",
+   "fromPort": 1,
+   "to": "n12",
+   "toPort": 1
+  }
+ ],
+ "annotations": [
+  {
+   "id": "a1",
+   "x": 30,
+   "y": -10,
+   "w": 500,
+   "h": 92,
+   "text": "Classification supervisée\nCliquez sur « Tout exécuter » (Maj+F7), puis sélectionnez « Évaluation » pour voir la matrice de confusion.",
+   "color": "bleu"
+  },
+  {
+   "id": "a2",
+   "x": 590,
+   "y": 440,
+   "w": 520,
+   "h": 92,
+   "text": "Pipeline = normalisation + modèle réentraînés ensemble.\nIl s'applique aux données brutes de test et la validation croisée ne fuit pas.",
+   "color": "vert"
+  }
+ ],
+ "version": 1,
+ "groups": [],
+ "name_en": "Iris classification",
+ "description_en": "Split, Pipeline (scaling + random forest), prediction, confusion matrix, ROC and leak-free cross-validation, with report text blocks."
+}

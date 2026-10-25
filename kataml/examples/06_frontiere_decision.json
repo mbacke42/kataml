@@ -1,0 +1,280 @@
+{
+ "name": "Frontières de décision et surapprentissage",
+ "description": "Deux lunes bruitées : arbre profond, arbre élagué, k plus proches voisins et SVM, côte à côte.",
+ "nodes": [
+  {
+   "id": "n1",
+   "type": "io.dataset",
+   "x": 40,
+   "y": 285.0,
+   "label": "Deux lunes",
+   "params": {
+    "dataset": "make_moons",
+    "n_samples": 400,
+    "noise": 0.3,
+    "random_state": 0
+   }
+  },
+  {
+   "id": "n2",
+   "type": "manip.partition",
+   "x": 320,
+   "y": 285.0,
+   "label": "Partition",
+   "params": {
+    "test_size": 0.3,
+    "stratify": "target",
+    "random_state": 0
+   }
+  },
+  {
+   "id": "m1",
+   "type": "sk.classifier.DecisionTreeClassifier",
+   "x": 600,
+   "y": 120,
+   "label": "Arbre profond",
+   "params": {
+    "target": "target",
+    "random_state": "0"
+   }
+  },
+  {
+   "id": "m2",
+   "type": "sk.classifier.DecisionTreeClassifier",
+   "x": 600,
+   "y": 230,
+   "label": "Arbre (profondeur 3)",
+   "params": {
+    "target": "target",
+    "max_depth": "3",
+    "random_state": "0"
+   }
+  },
+  {
+   "id": "m3",
+   "type": "sk.classifier.KNeighborsClassifier",
+   "x": 600,
+   "y": 340,
+   "label": "15 voisins",
+   "params": {
+    "target": "target",
+    "n_neighbors": "15"
+   }
+  },
+  {
+   "id": "m4",
+   "type": "sk.classifier.SVC",
+   "x": 600,
+   "y": 450,
+   "label": "SVM RBF",
+   "params": {
+    "target": "target",
+    "random_state": "0"
+   }
+  },
+  {
+   "id": "d1",
+   "type": "explain.decision_boundary",
+   "x": 880,
+   "y": 120,
+   "label": "Frontière : arbre profond",
+   "params": {}
+  },
+  {
+   "id": "d2",
+   "type": "explain.decision_boundary",
+   "x": 880,
+   "y": 230,
+   "label": "Frontière : arbre élagué",
+   "params": {}
+  },
+  {
+   "id": "d3",
+   "type": "explain.decision_boundary",
+   "x": 880,
+   "y": 340,
+   "label": "Frontière : 15 voisins",
+   "params": {}
+  },
+  {
+   "id": "d4",
+   "type": "explain.decision_boundary",
+   "x": 880,
+   "y": 450,
+   "label": "Frontière : SVM",
+   "params": {}
+  },
+  {
+   "id": "c1",
+   "type": "tune.compare",
+   "x": 1160,
+   "y": 285.0,
+   "label": "Comparaison (CV)",
+   "params": {}
+  },
+  {
+   "id": "v1",
+   "type": "tune.validation_curve",
+   "x": 1160,
+   "y": 120,
+   "label": "Profondeur de l'arbre",
+   "params": {
+    "param": "max_depth",
+    "values": "[1, 2, 3, 4, 6, 8, 12, None]"
+   }
+  },
+  {
+   "id": "t1",
+   "type": "explain.tree",
+   "x": 1160,
+   "y": 450,
+   "label": "Arbre élagué",
+   "params": {
+    "max_depth": 3
+   }
+  }
+ ],
+ "edges": [
+  {
+   "from": "n1",
+   "fromPort": 0,
+   "to": "n2",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "m1",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "m2",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "m3",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "m4",
+   "toPort": 0
+  },
+  {
+   "from": "m1",
+   "fromPort": 0,
+   "to": "d1",
+   "toPort": 0
+  },
+  {
+   "from": "m2",
+   "fromPort": 0,
+   "to": "d2",
+   "toPort": 0
+  },
+  {
+   "from": "m3",
+   "fromPort": 0,
+   "to": "d3",
+   "toPort": 0
+  },
+  {
+   "from": "m4",
+   "fromPort": 0,
+   "to": "d4",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 1,
+   "to": "d1",
+   "toPort": 1
+  },
+  {
+   "from": "n2",
+   "fromPort": 1,
+   "to": "d2",
+   "toPort": 1
+  },
+  {
+   "from": "n2",
+   "fromPort": 1,
+   "to": "d3",
+   "toPort": 1
+  },
+  {
+   "from": "n2",
+   "fromPort": 1,
+   "to": "d4",
+   "toPort": 1
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "c1",
+   "toPort": 0
+  },
+  {
+   "from": "m1",
+   "fromPort": 0,
+   "to": "c1",
+   "toPort": 1
+  },
+  {
+   "from": "m2",
+   "fromPort": 0,
+   "to": "c1",
+   "toPort": 2
+  },
+  {
+   "from": "m3",
+   "fromPort": 0,
+   "to": "c1",
+   "toPort": 3
+  },
+  {
+   "from": "m4",
+   "fromPort": 0,
+   "to": "c1",
+   "toPort": 4
+  },
+  {
+   "from": "m1",
+   "fromPort": 0,
+   "to": "v1",
+   "toPort": 0
+  },
+  {
+   "from": "n2",
+   "fromPort": 0,
+   "to": "v1",
+   "toPort": 1
+  },
+  {
+   "from": "m2",
+   "fromPort": 0,
+   "to": "t1",
+   "toPort": 0
+  }
+ ],
+ "annotations": [
+  {
+   "id": "a1",
+   "x": 30,
+   "y": -10,
+   "w": 560,
+   "h": 92,
+   "text": "Voir le surapprentissage\nComparez les frontières : l'arbre profond découpe le bruit, l'arbre élagué et le SVM généralisent mieux. La courbe de validation le confirme.",
+   "color": "jaune"
+  }
+ ],
+ "version": 1,
+ "groups": [],
+ "name_en": "Decision boundaries and overfitting",
+ "description_en": "Noisy two moons: deep tree, pruned tree, k nearest neighbours and SVM side by side."
+}

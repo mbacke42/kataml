@@ -1,0 +1,130 @@
+site_name: KataML
+site_description: Atelier visuel de machine learning fondé sur scikit-learn — Visual machine learning workbench built on scikit-learn
+site_url: https://fredbl.gitlab.io/kataml/
+repo_url: https://gitlab.com/fredbl/kataml
+repo_name: fredbl/kataml
+edit_uri: ""
+copyright: KataML — Keen-edged Analytics Toolkit for Applied Machine Learning
+docs_dir: docs
+site_dir: public
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+theme:
+  name: material
+  language: fr
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - navigation.footer
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - toc.follow
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle: { icon: material/weather-night, name: Mode sombre / Dark mode }
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle: { icon: material/weather-sunny, name: Mode clair / Light mode }
+  font: false
+
+extra_css:
+  - assets/css/extra.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc: { permalink: true }
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.keys
+  - pymdownx.tabbed: { alternate_style: true }
+  - pymdownx.tasklist: { custom_checkbox: true }
+
+nav:
+  - Démarrer:
+      - index.md
+      - installation.md
+  - Interface:
+      - interface/index.md
+      - interface/toolbar.md
+      - interface/repository.md
+      - interface/canvas.md
+      - interface/inspector.md
+      - interface/outputs.md
+      - interface/shortcuts.md
+      - interface/appearance.md
+  - Concepts:
+      - concepts/nodes.md
+      - concepts/execution.md
+      - concepts/pipeline.md
+      - concepts/cross-validation.md
+      - concepts/components.md
+      - concepts/workspace.md
+  - Tutoriels:
+      - tutorials/index.md
+      - tutorials/01-first-workflow.md
+      - tutorials/02-leakage.md
+      - tutorials/03-csv-cleaning.md
+      - tutorials/04-regression.md
+      - tutorials/05-overfitting.md
+      - tutorials/06-tuning.md
+      - tutorials/07-unsupervised.md
+      - tutorials/08-text-dates.md
+      - tutorials/09-understanding.md
+      - tutorials/10-report-blocks.md
+  - Référence des nœuds:
+      - reference/index.md
+      - reference/data.md
+      - reference/manip.md
+      - reference/viz.md
+      - reference/transform.md
+      - reference/supervised.md
+      - reference/unsupervised.md
+      - reference/predict.md
+      - reference/model-selection.md
+      - reference/inspection.md
+      - reference/report.md
+  - Aller plus loin:
+      - reports.md
+      - blocks.md
+      - cli.md
+      - portable.md
+      - faq.md
+      - changelog.md
+
+plugins:
+  - search
+  - i18n:
+      docs_structure: folder
+      languages:
+        - locale: fr
+          default: true
+          name: Français
+          build: true
+        - locale: en
+          name: English
+          build: true
+          site_name: KataML
+          theme: { language: en }
+          nav_translations:
+            Démarrer: Getting started
+            Tutoriels: Tutorials
+            Référence des nœuds: Node reference
+            Aller plus loin: Going further

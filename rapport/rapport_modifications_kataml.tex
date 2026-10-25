@@ -1,0 +1,704 @@
+% Rapport des modifications apportées à KataML (version de base 0.5.8)
+% Compilation : pdflatex (Overleaf, MacTeX) ou lualatex / xelatex.
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+  \usepackage{lmodern}
+  \usepackage[french]{babel}
+\else
+  \usepackage{fontspec}
+  \usepackage{polyglossia}
+  \setmainlanguage{french}
+\fi
+
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{needspace}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+
+% ---------------------------------------------------------------------------
+% À compléter
+\newcommand{\auteur}{Votre nom}
+\newcommand{\encadrant}{Nom du professeur}
+\newcommand{\annee}{2026--2027}
+% Logo de l'université : placer le fichier officiel à côté de ce .tex sous le nom
+% logo_urca (.pdf, .png ou .jpg). Sans fichier, un cadre de remplacement s'affiche.
+\newcommand{\fichierlogo}{logo_urca}
+% ---------------------------------------------------------------------------
+
+\newcommand{\universite}{Université de Reims Champagne-Ardenne}
+\newcommand{\ufr}{UFR Sciences économiques, sociales et de gestion}
+\newcommand{\formation}{Master Analyse et politique économique}
+\newcommand{\parcours}{Parcours Statistique pour l'évaluation et la prévision (SEP)}
+
+% Logo, ou cadre de remplacement si le fichier est absent.
+\newcommand{\logo}[1]{%
+  \IfFileExists{\fichierlogo.pdf}{\includegraphics[height=#1]{\fichierlogo.pdf}}{%
+  \IfFileExists{\fichierlogo.png}{\includegraphics[height=#1]{\fichierlogo.png}}{%
+  \IfFileExists{\fichierlogo.jpg}{\includegraphics[height=#1]{\fichierlogo.jpg}}{%
+  \fbox{\parbox[c][#1][c]{\dimexpr #1*2\relax}{\centering\scriptsize\color{gris}logo\\URCA}}}}}}
+
+\definecolor{accent}{HTML}{0F766E}
+\definecolor{fond}{HTML}{F4F7F6}
+\definecolor{gris}{HTML}{5F5E5A}
+\definecolor{orange}{HTML}{C2410C}
+
+\hypersetup{colorlinks=true,linkcolor=accent,urlcolor=accent,citecolor=accent}
+
+\setlist{itemsep=2pt,topsep=4pt}
+\setlength{\parskip}{4pt}
+\setlength{\emergencystretch}{2.5em}
+
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{24pt}
+\fancyhead[L]{\raisebox{-0.25\height}{\logo{0.55cm}}\hspace{6pt}\small\color{gris}Master SEP -- KataML}
+\fancyhead[R]{\small\color{gris}\leftmark}
+\fancyfoot[L]{\scriptsize\color{gris}\universite}
+\fancyfoot[C]{\small\thepage}
+\fancyfoot[R]{\scriptsize\color{gris}\annee}
+\renewcommand{\headrulewidth}{0.3pt}
+
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\ui}[1]{\textsf{\textbf{#1}}}   % nom d'un nœud ou d'un bouton
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{fond},
+  frame=single, rulecolor=\color{fond},
+  xleftmargin=4pt, xrightmargin=4pt, framesep=6pt,
+  keywordstyle=\color{accent}\bfseries,
+  commentstyle=\color{gris}\itshape,
+  stringstyle=\color{orange},
+  showstringspaces=false, breaklines=true, columns=fullflexible, keepspaces=true,
+  literate={é}{{\'e}}1 {è}{{\`e}}1 {ê}{{\^e}}1 {à}{{\`a}}1 {â}{{\^a}}1 {ç}{{\c c}}1
+           {ô}{{\^o}}1 {ù}{{\`u}}1 {û}{{\^u}}1 {î}{{\^i}}1 {É}{{\'E}}1 {œ}{{\oe}}1
+           {«}{{\guillemotleft}}1 {»}{{\guillemotright}}1 {…}{{\ldots}}1 {→}{{$\rightarrow$}}1,
+}
+\lstdefinelanguage{bash}{keywords={cd,export,uv,run,python},sensitive=true,comment=[l]\#}
+
+\begin{document}
+
+% ===========================================================================
+\begin{titlepage}
+  \thispagestyle{empty}%
+  \noindent\begin{minipage}[c]{0.34\linewidth}
+    \logo{2.3cm}
+  \end{minipage}\hfill
+  \begin{minipage}[c]{0.6\linewidth}
+    \raggedleft\small
+    {\bfseries\universite}\\[2pt]
+    \ufr\\[2pt]
+    \formation\\
+    Parcours Statistique pour l'évaluation et la prévision\\
+    {\bfseries Master SEP}
+  \end{minipage}
+
+  \vspace{3.2cm}
+  \centering
+  {\color{accent}\rule{\linewidth}{1.2pt}}\\[14pt]
+  {\Huge\bfseries KataML}\\[8pt]
+  {\LARGE Rapport des modifications}\\[10pt]
+  {\large Adaptation à macOS, chargement des données et des bases de données,\\
+  import de scripts Python, performances}\\[10pt]
+  {\color{accent}\rule{\linewidth}{1.2pt}}\\[2cm]
+
+  \begin{tabular}{rl}
+    \textbf{Réalisé par} & \auteur, étudiant en master SEP \\
+    \textbf{Encadrant} & \encadrant \\
+    \textbf{Formation} & \formation, parcours SEP \\
+    \textbf{Année universitaire} & \annee \\
+    \textbf{Date} & 25 octobre 2026 \\[8pt]
+    \textbf{Application} & KataML, atelier visuel de machine learning (scikit-learn) \\
+    \textbf{Version de départ} & 0.5.8 (16 octobre 2026), licence MIT \\
+    \textbf{Dépôt} & \url{https://gitlab.com/fredbl/kataml} \\
+  \end{tabular}
+
+  \vfill
+  \begin{minipage}{0.85\linewidth}
+    \small\color{gris}
+    Ce document décrit les fonctionnalités ajoutées à KataML dans le cadre du master
+    Statistique pour l'évaluation et la prévision, leur fonctionnement interne, les
+    fichiers modifiés et les tests écrits. Il peut accompagner une demande de fusion
+    (\emph{merge request}) sur le dépôt GitLab du projet.
+  \end{minipage}
+
+  \vspace{0.8cm}
+  {\small\color{gris}\universite\ --- \annee}
+\end{titlepage}
+
+\tableofcontents
+\clearpage
+
+% ===========================================================================
+\section*{Résumé}
+\addcontentsline{toc}{section}{Résumé}
+
+KataML est un atelier visuel de machine learning : on y construit une analyse en
+reliant des nœuds sur un canevas, et les calculs sont confiés à pandas et
+scikit-learn. Partant de la version 0.5.8, les travaux décrits ici visaient trois
+objectifs : faire fonctionner l'application sur un Mac à puce Apple, faciliter
+l'arrivée d'un projet existant (données, bases de données, scripts Python) dans
+l'application, et réduire les temps de calcul sur les gros jeux de données.
+
+\medskip
+\noindent Les principaux apports sont :
+\begin{itemize}
+  \item deux nouveaux nœuds de lecture : \ui{Lecteur Parquet / Excel} et
+        \ui{Lecteur SQL} (SQLite, PostgreSQL, MySQL) ;
+  \item l'\textbf{import d'un script Python}, converti en schéma sans être exécuté,
+        y compris sur plusieurs fichiers et avec le code de préparation des données ;
+  \item une fenêtre \ui{Données et scripts} avec une bibliothèque de scripts et
+        l'import d'un dossier de projet complet ;
+  \item des calculs répartis sur \textbf{tous les cœurs} du processeur et la
+        suppression d'un double entraînement ;
+  \item un comportement plus sûr des encodeurs sur les colonnes texte.
+\end{itemize}
+
+\noindent Le tout est traduit en anglais, documenté (français et anglais) et couvert
+par 15 nouveaux tests. L'ensemble représente environ 1\,700 lignes dans de
+nouveaux fichiers et 480 lignes ajoutées aux fichiers existants.
+
+% ===========================================================================
+\section{Contexte et objectifs}
+
+KataML a été développé pour l'enseignement du machine learning. Chaque nœud du
+canevas correspond à une étape d'une analyse (lecture des données, préparation,
+modèle, évaluation) et le workflow complet s'exporte en script Python ou en
+notebook Jupyter. L'application est un serveur web local écrit en Python : le
+navigateur affiche l'interface, un processus séparé exécute les calculs.
+
+Ce travail a été mené dans le cadre du \textbf{master Statistique pour l'évaluation
+et la prévision (SEP)} de l'Université de Reims Champagne-Ardenne, où KataML est
+utilisé comme support d'enseignement du machine learning. Son point de départ était
+une difficulté pratique : l'application ne semblait pas pouvoir être lancée sur un
+Mac. Une fois ce point éclairci, le travail s'est poursuivi sur un cas concret, le
+projet de \textbf{prédiction des retards de vols} réalisé dans le master (données de
+vols et de météo dans PostgreSQL, régression logistique avec scikit-learn), avec la
+question suivante : comment importer facilement un tel projet dans KataML pour le
+visualiser et le faire évoluer ?
+
+Les objectifs retenus ont été :
+\begin{enumerate}
+  \item lancer KataML sur macOS (puce Apple) ;
+  \item lire les formats de données courants (Parquet, Excel) et les bases SQL ;
+  \item reconstruire automatiquement le schéma d'un script Python existant ;
+  \item rassembler les données et les scripts d'un projet dans l'application ;
+  \item accélérer les calculs sur de gros volumes ;
+  \item corriger les erreurs rencontrées avec les colonnes texte.
+\end{enumerate}
+
+% ===========================================================================
+\section{Fonctionnement sur macOS}
+
+L'analyse du code a montré qu'\textbf{aucune modification n'était nécessaire} pour
+macOS. KataML est écrit en Python pur ; il ne dépend que de pandas et de
+scikit-learn, qui existent pour les Mac à puce Apple. Le processus de calcul utilise
+déjà le mode de démarrage \code{spawn}, qui est celui de macOS, et le script de
+lancement \code{kataml.sh} est compatible.
+
+La difficulté venait de la distribution : les versions « portables » publiées (qui
+embarquent Python) n'existent que pour Linux (AppImage) et Windows (archive zip).
+Sur Mac, il faut passer par l'installation avec \code{uv}, déjà documentée :
+
+\begin{lstlisting}[language=bash]
+curl -LsSf https://astral.sh/uv/install.sh | sh    # une seule fois
+cd ~/Documents/master/kataml-v0.5.8
+./kataml.sh                                        # le navigateur s'ouvre
+\end{lstlisting}
+
+Une version portable pour macOS (application \code{.app}) reste une piste possible
+pour le projet (voir section~\ref{sec:perspectives}).
+
+% ===========================================================================
+\section{Chargement des données}
+
+\subsection{Lecteur Parquet / Excel}
+
+Le nœud \ui{Lecteur Parquet / Excel} (\code{io.table\_reader}) lit les formats
+suivants ; le format est déduit de l'extension du fichier.
+
+\begin{center}
+\begin{tabular}{lll}
+  \toprule
+  \textbf{Format} & \textbf{Extensions} & \textbf{Fonction pandas} \\
+  \midrule
+  Parquet & \code{.parquet}, \code{.pq} & \code{read\_parquet} (pyarrow) \\
+  Excel   & \code{.xlsx}, \code{.xlsm}, \code{.xls} & \code{read\_excel} (openpyxl) \\
+  Feather & \code{.feather} & \code{read\_feather} \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+Pour Excel, un paramètre permet de choisir la feuille, par son nom ou son numéro
+(première feuille par défaut). Si une bibliothèque manque, le nœud indique laquelle
+installer. Les paquets \code{pyarrow} et \code{openpyxl} ont été ajoutés aux
+dépendances (\code{pyproject.toml} et \code{requirements.txt}). Comme tous les
+nœuds, ce lecteur s'exporte en code Python : \code{pd.read\_parquet('vols.parquet')}.
+
+\subsection{Lecteur SQL}
+
+Le nœud \ui{Lecteur SQL} (\code{io.sql\_reader}) exécute une requête et renvoie le
+résultat sous forme de table. La base peut être :
+\begin{itemize}
+  \item un \textbf{fichier SQLite} (\code{.db}, \code{.sqlite}) du dossier de données,
+        ouvert en \textbf{lecture seule} : une requête ne peut pas modifier la base ;
+  \item une \textbf{URL de connexion} SQLAlchemy vers PostgreSQL ou MySQL, par exemple
+        \nolinkurl{postgresql+psycopg://utilisateur@localhost:5432/db_vols}.
+\end{itemize}
+
+Le champ « requête » accepte une requête SQL, un simple nom de table, ou rien du tout
+s'il n'y a qu'une table ; en cas d'ambiguïté, la liste des tables disponibles est
+affichée. Un nombre maximal de lignes permet de travailler sur un extrait.
+
+\paragraph{Sécurité.} Écrire une URL contenant un mot de passe dans le nœud
+l'enregistrerait en clair dans le fichier du workflow. Le nœud accepte donc la
+syntaxe \code{\$DATABASE\_URL} : l'URL est lue dans la variable d'environnement du
+même nom, définie avant de lancer l'application.
+
+\begin{lstlisting}[language=bash]
+uv pip install sqlalchemy "psycopg[binary]"        # pilote PostgreSQL, une fois
+export DATABASE_URL=postgresql+psycopg://utilisateur:motdepasse@localhost:5432/db_vols
+./kataml.sh
+\end{lstlisting}
+
+\subsection{Import des fichiers}
+
+Deux améliorations complètent ces lecteurs :
+\begin{itemize}
+  \item \textbf{dépôt sur le canevas} : un fichier déposé crée automatiquement le
+        lecteur adapté (CSV, Parquet / Excel ou SQL selon l'extension) ;
+  \item \textbf{bouton « Importer » de l'inspecteur} : il ne proposait que les
+        fichiers CSV, y compris dans les nouveaux lecteurs, si bien que les fichiers
+        Parquet ou Excel apparaissaient grisés. Il propose désormais les extensions
+        du lecteur concerné.
+\end{itemize}
+
+% ===========================================================================
+\section{Import d'un script Python en schéma}
+\label{sec:import}
+
+\subsection{Principe}
+
+Cette fonctionnalité reconstruit le workflow équivalent à un script pandas /
+scikit-learn. Le script n'est \textbf{jamais exécuté} : il est analysé avec le module
+\code{ast} de Python, qui le transforme en arbre syntaxique. Un interpréteur
+« symbolique » parcourt ensuite cet arbre instruction par instruction et suit des
+\emph{valeurs abstraites} plutôt que des données réelles. Cette approche a trois
+avantages : elle est sûre (aucun code n'est lancé), rapide, et fonctionne sans les
+données ni la base de données du projet.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  box/.style={draw=accent, fill=accent!8, rounded corners=3pt, minimum height=1.1cm,
+              text width=2.35cm, align=center, font=\small},
+  arr/.style={-{Stealth[length=6pt]}, thick, color=gris},
+  node distance=0.55cm]
+  \node[box] (src) {Scripts \code{.py}\\(+ modules)};
+  \node[box, right=of src] (ast) {Arbre syntaxique\\(\code{ast})};
+  \node[box, right=of ast] (interp) {Interprétation\\symbolique};
+  \node[box, right=of interp] (wf) {Workflow\\JSON};
+  \node[box, right=of wf] (canvas) {Canevas\\+ note};
+  \draw[arr] (src) -- (ast);
+  \draw[arr] (ast) -- (interp);
+  \draw[arr] (interp) -- (wf);
+  \draw[arr] (wf) -- (canvas);
+  \node[below=0.35cm of interp, font=\footnotesize\color{gris}, text width=8cm, align=center]
+    {tables, estimateurs, pipelines, modèles ajustés, prédictions,\\expressions pandas différées};
+\end{tikzpicture}
+\caption{Chaîne de traitement de l'import de script (module \code{kataml/py\_import.py}).}
+\end{figure}
+
+\subsection{Valeurs suivies}
+
+L'interpréteur associe à chaque variable du script une valeur abstraite :
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+  \toprule
+  \textbf{Valeur} & \textbf{Signification} \\
+  \midrule
+  \code{Tab} & une table produite par un nœud (sortie d'un port), avec son rôle :
+               table, variables explicatives \code{X}, cible \code{y} ou prédictions \\
+  \code{Est} & un estimateur scikit-learn non ajusté et ses hyperparamètres \\
+  \code{Pipe}, \code{ColT} & un \code{Pipeline} (avec le nom de ses étapes) et un
+               \code{ColumnTransformer} (transformeurs et colonnes) \\
+  \code{Fitted} & un modèle ajusté, c'est-à-dire un nœud dont la sortie est un modèle \\
+  \code{Deferred} & une expression pandas mise de côté (un masque, une série de dates),
+               recopiée là où elle est utilisée \\
+  littéraux & constantes du script (nom de la cible, listes de colonnes, chemins) \\
+  \bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Éléments reconnus}
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lX}
+  \toprule
+  \textbf{Code Python} & \textbf{Nœuds créés} \\
+  \midrule
+  \code{pd.read\_csv}, \code{read\_parquet}, \code{read\_excel} & lecteur CSV ou Parquet / Excel \\
+  \code{pd.read\_sql}, \code{create\_engine}, \code{os.getenv} & lecteur SQL (requête reconstruite, URL en \code{\$VARIABLE}) \\
+  \code{load\_iris()}… & jeu de données scikit-learn \\
+  \code{dropna}, \code{drop(columns=…)}, \code{df[[…]]} & lignes incomplètes, filtre de colonnes \\
+  \code{train\_test\_split} & partitionnement (proportion, stratification, graine) \\
+  estimateurs, \code{Pipeline}, \code{ColumnTransformer} & transformeurs, modèle et nœud Pipeline \\
+  \code{fit}, \code{predict}, \code{predict\_proba}, \code{score} & prédicteur \\
+  métriques \code{sklearn.metrics} & évaluation (classification, régression) ou courbe ROC \\
+  \code{cross\_val\_score}, \code{cross\_validate} & validation croisée (stratégie et métriques) \\
+  \code{cross\_val\_predict} & prédictions hors pli \\
+  autres opérations pandas sur une table & nœud \ui{Script Python} reproduisant le code \\
+  \bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Points notables}
+
+\paragraph{Suivi des fonctions.} Les fonctions définies dans le script sont suivies
+(« inlining ») : leurs paramètres reçoivent les valeurs abstraites des arguments et
+la valeur renvoyée est récupérée. Les pipelines ajustés étape par étape, à travers
+\code{named\_steps["preprocesseur"]} puis \code{fit\_transform}, sont réassemblés.
+
+\paragraph{Plusieurs fichiers.} Un projet réparti en modules
+(\code{from app.config.constants import ...}) est pris en charge : les fichiers
+importés par le script principal servent de bibliothèques, leurs constantes et
+fonctions sont reprises. Les modèles identiques construits deux fois (deux appels à
+\code{creer\_modele()}) ne produisent qu'une seule série de nœuds.
+
+\paragraph{Code de préparation.} Les opérations pandas non reconnues deviennent des
+nœuds \ui{Script Python} lisibles. Les variables intermédiaires (masques, dates) sont
+réinjectées dans le code, et les opérations sur deux tables utilisent les deux
+entrées du nœud (\code{df} et \code{df2}). Seules les chaînes pandas partant d'une
+table et produisant une table sont converties ; le code de calcul (numpy, métriques
+maison) est laissé de côté.
+
+\paragraph{Liaison entre scripts.} Lorsqu'un script écrit un fichier
+(\code{to\_parquet}) qu'un autre relit, les deux parties sont reliées directement :
+la préparation et le modèle forment un seul schéma.
+
+\paragraph{Transparence.} Ce qui n'a pas pu être déduit (un chemin calculé, un
+paramètre non littéral) est listé dans une note jaune posée sur le canevas.
+
+\subsection{Exemple : le projet de retards de vols}
+
+Les deux scripts principaux du projet (\code{preparation.py} et
+\code{regression\_logistique.py}) et leurs modules de configuration donnent un schéma
+de 22 nœuds reliés, sans aucune retouche :
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  n/.style={draw=accent, fill=accent!8, rounded corners=2pt, font=\scriptsize,
+            minimum height=0.75cm, text width=2.05cm, align=center},
+  m/.style={n, draw=orange, fill=orange!8},
+  arr/.style={-{Stealth[length=4pt]}, color=gris},
+  node distance=0.32cm and 0.38cm]
+  \node[n] (sql) {Lecteur SQL\\\code{\$DATABASE\_URL}};
+  \node[n, right=of sql] (prep) {6 nœuds\\Script Python};
+  \node[n, right=of prep] (drop) {Filtre de\\colonnes};
+  \node[n, right=of drop] (part) {Partition 80/20\\stratifiée};
+  \node[n, right=of part] (dummy) {Référence naïve,\\évaluation};
+  \node[m, below=1.0cm of sql] (te) {OneHot, Target-\\Encoder, Scaler};
+  \node[m, right=of te] (lr) {Régression\\logistique};
+  \node[m, right=of lr] (pipe) {Pipeline};
+  \node[n, right=of pipe] (eval) {Prédicteur,\\évaluation};
+  \node[n, below=0.5cm of pipe] (cvp) {Prédictions hors pli,\\évaluation};
+  \draw[arr] (sql) -- (prep);
+  \draw[arr] (prep) -- (drop);
+  \draw[arr] (drop) -- (part);
+  \draw[arr] (part) -- (dummy);
+  \draw[arr] (part.south) -- ++(0,-0.42) -| (te.north);
+  \draw[arr] (te) -- (lr);
+  \draw[arr] (lr) -- (pipe);
+  \draw[arr] (pipe) -- (eval);
+  \draw[arr] (pipe) -- (cvp);
+\end{tikzpicture}
+\caption{Schéma reconstruit à partir du projet de retards de vols (vue simplifiée).}
+\end{figure}
+
+Le lecteur SQL reprend la requête construite par f-string, la colonne cible
+\code{RETARD\_15} et les listes de colonnes sont retrouvées dans le module de
+préparation, et le \code{TargetEncoder} des aéroports est placé dans le Pipeline
+comme dans le script d'origine.
+
+\subsection{Limites}
+
+L'analyse est statique : ce qui ne se décide qu'à l'exécution (un chemin construit
+dynamiquement, une boucle sur des modèles, une condition) est approché ou signalé
+dans la note. Les boucles ne sont parcourues qu'une fois et seule la première branche
+d'un \code{if} est suivie. Le nœud Pipeline de KataML accepte trois prétraitements au
+plus ; au-delà, le Pipeline n'est pas créé et la note l'indique.
+
+% ===========================================================================
+\section{Espace « Données et scripts »}
+
+Un bouton \ui{Données} ajouté à la barre d'outils ouvre une fenêtre en deux parties
+(fichier \code{static/js/project.js}).
+
+\begin{itemize}
+  \item \textbf{Données} (\code{workspace/data}) : fichiers CSV, Parquet, Excel et
+        bases SQLite, avec leur type et leur taille. \ui{Au canevas} crée le lecteur
+        adapté ; on peut importer des fichiers ou les déposer dans la fenêtre, et
+        retirer un fichier.
+  \item \textbf{Scripts} (\code{workspace/scripts}) : une bibliothèque de scripts
+        Python. On peut ajouter des fichiers, créer un script à partir d'un modèle
+        commenté, l'éditer, puis cocher les scripts à convertir et cliquer sur
+        \ui{Créer le schéma}. Les autres scripts de la bibliothèque servent de
+        modules s'ils sont importés.
+\end{itemize}
+
+\paragraph{Import d'un dossier de projet.} Le bouton \ui{Importer un dossier de
+projet} prend tout un dossier. Les scripts rejoignent la bibliothèque ; les dossiers
+\code{.venv}, \code{.git}, \code{\_\_pycache\_\_} et les caches sont ignorés, ainsi que les
+fichiers vides et les tests. Les fichiers de données sont seulement repérés : lors de
+la conversion, seuls ceux que le schéma lit réellement sont importés, ce qui évite
+d'envoyer des centaines de mégaoctets inutiles. S'il manque des fichiers, KataML les
+liste et propose de les importer.
+
+\paragraph{Routes ajoutées au serveur.}
+\begin{center}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{6.2cm}X}
+  \toprule
+  \textbf{Route} & \textbf{Rôle} \\
+  \midrule
+  \code{/api/import\_script} & conversion de scripts ; renvoie aussi les données manquantes \\
+  \code{/api/scripts} & liste de la bibliothèque de scripts \\
+  \code{/api/script/read}, \code{save}, \code{delete} & lecture, enregistrement, suppression d'un script \\
+  \code{/api/data/delete} & retrait d'un fichier de données \\
+  \bottomrule
+\end{tabularx}
+\end{center}
+
+Ces routes réutilisent les protections existantes du serveur : jeton secret pour
+chaque requête et noms de fichiers validés, qui empêchent d'écrire en dehors du
+dossier de travail.
+
+% ===========================================================================
+\section{Performances}
+
+\subsection{Calcul sur tous les cœurs}
+
+Les nœuds de validation croisée, de recherche d'hyperparamètres, de courbes et de
+permutations entraînent le modèle de nombreuses fois, mais KataML ne précisait jamais
+le paramètre \code{n\_jobs} de scikit-learn : tout s'exécutait sur un seul cœur. Ces
+calculs sont désormais répartis sur tous les cœurs dans les nœuds suivants :
+validation croisée, prédictions hors pli, comparaison de modèles, recherche
+d'hyperparamètres (grille et aléatoire), courbes d'apprentissage et de validation,
+importance par permutation et test de permutation.
+
+Le lancement de processus parallèles coûte environ une seconde. En dessous de
+\textbf{10\,000 lignes}, le calcul reste donc sur un cœur, afin de ne pas ralentir
+les petits jeux de données des exemples de cours. Le nombre de cœurs se règle au
+lancement :
+
+\begin{lstlisting}[language=bash]
+./kataml.sh --jobs 4          # 4 coeurs (-1 = tous, défaut ; 1 = un seul)
+./kataml.sh --cache-mb 4096   # cache des résultats plus grand (1024 Mo par défaut)
+\end{lstlisting}
+
+\subsection{Prédictions hors pli sans double entraînement}
+
+Le nœud \ui{Prédictions hors pli} appelait deux fois \code{cross\_val\_predict} :
+une fois pour les classes prédites, une fois pour les probabilités, soit deux séries
+complètes d'entraînements. Pour les classifieurs dont la prédiction est exactement la
+classe de plus forte probabilité, la classe se déduit maintenant des probabilités :
+\[
+  \hat{y}(x) = \operatorname*{arg\,max}_{k}\ \hat{p}_k(x).
+\]
+C'est le cas de la régression logistique, des arbres, des forêts, du boosting, des
+plus proches voisins, des bayésiens naïfs, du perceptron multicouche et des analyses
+discriminantes. Pour les autres (par exemple un SVC avec \code{probability=True}, dont
+les probabilités sont calibrées à part), les deux calculs sont conservés.
+
+\needspace{12\baselineskip}
+\subsection{Mesures}
+
+Les mesures ci-dessous ont été faites dans un environnement de test à 2 cœurs, sur
+60\,000 lignes et 20 variables, avec une validation croisée à 5 plis. Les prédictions
+et les probabilités obtenues sont \textbf{strictement identiques} à celles de la
+version d'origine.
+
+\begin{center}
+\begin{tabular}{lrrc}
+  \toprule
+  \textbf{Modèle} & \textbf{Avant} & \textbf{Après} & \textbf{Résultats identiques} \\
+  \midrule
+  Forêt aléatoire (60 arbres) & 138,7 s & 44,0 s & oui \\
+  HistGradientBoosting        & 5,7 s   & 2,2 s  & oui \\
+  Régression logistique       & 0,6 s   & 1,4 s  & oui \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+Le gain croît avec la durée du calcul et le nombre de cœurs ; un Mac récent en
+compte au moins 8, ce qui laisse attendre un gain plus important. Pour un calcul très
+court comme la régression logistique ci-dessus, le coût de lancement des processus
+domine. Ces mesures n'ont pas encore été refaites sur le Mac lui-même.
+
+% ===========================================================================
+\section{Encodeurs et colonnes texte}
+
+Avec les données de vols, le \code{TargetEncoder} semblait refuser les colonnes
+texte (codes d'aéroports). En réalité, scikit-learn les accepte ; trois situations
+produisaient des erreurs :
+
+\begin{enumerate}
+  \item \textbf{Cible non renseignée.} Le \code{TargetEncoder} calcule pour chaque
+        catégorie la moyenne de la cible ; sans cible, scikit-learn renvoyait un message
+        obscur (\code{Expected array-like ... got None}). KataML vérifie maintenant si un
+        transformeur exige la cible (étiquettes de scikit-learn, complétées pour les
+        sélecteurs de variables) et l'indique clairement.
+  \item \textbf{Colonnes laissées vides.} Un transformeur sans colonnes choisies
+        s'appliquait à toutes les colonnes : une normalisation échouait alors sur du
+        texte. Désormais, les encodeurs (\code{OneHotEncoder}, \code{OrdinalEncoder},
+        \code{TargetEncoder}) prennent par défaut les seules colonnes texte, et les
+        normalisations et réductions de dimension (\code{StandardScaler}, \code{PCA}…) les
+        seules colonnes numériques. Les colonnes retenues sont affichées dans les
+        messages du nœud, et le code exporté reproduit ce choix.
+  \item \textbf{Colonne texte non encodée.} Une colonne texte qui arrive jusqu'au modèle
+        provoque une erreur ; le message existant de KataML l'explique déjà.
+\end{enumerate}
+
+Pour le projet de vols, le montage recommandé est :
+\begin{center}
+\small
+Lecteur Parquet $\rightarrow$ Partitionnement $\rightarrow$
+\code{TargetEncoder} (\code{ORIGIN}, \code{DEST}) $\rightarrow$
+\code{OneHotEncoder} (\code{OP\_UNIQUE\_CARRIER}) $\rightarrow$
+\code{StandardScaler} $\rightarrow$ régression logistique,
+\end{center}
+avec la cible \code{RETARD\_15} renseignée dans chaque transformeur et les quatre nœuds
+réunis dans un Pipeline pour les prédictions sur le jeu de test.
+
+% ===========================================================================
+\section{Traduction et documentation}
+
+KataML est bilingue : l'interface et les messages sont écrits en français et traduits
+en anglais à l'affichage. Tous les nouveaux nœuds, paramètres, boutons et messages ont
+été ajoutés aux dictionnaires de traduction (\code{kataml/i18n.py} pour le serveur,
+\code{static/js/i18n.js} pour l'interface), y compris les messages composés (motifs
+d'expressions régulières).
+
+La documentation MkDocs a été complétée dans les deux langues : barre d'outils
+(import de script, fenêtre \ui{Données}, bases de données), dépôt de fichiers sur le
+canevas, options de lancement et historique des versions.
+
+% ===========================================================================
+\section{Tests}
+
+Trois fichiers de tests ont été ajoutés ; ils s'exécutent avec la suite existante
+(\code{uv run python -m unittest discover -v tests}).
+
+\begin{center}
+\begin{tabularx}{\linewidth}{lcX}
+  \toprule
+  \textbf{Fichier} & \textbf{Tests} & \textbf{Contenu} \\
+  \midrule
+  \code{test\_py\_import.py} & 9 &
+    conversion d'un script en workflow exécutable ; modules et constantes ; Parquet ;
+    repli vers Script Python ; scripts invalides ; lecteur Parquet / Excel et code
+    exporté ; lecteur SQL (requête, table, erreurs, variable d'environnement) ;
+    script avec base de données ; bibliothèque de scripts \\
+  \code{test\_performance.py} & 3 &
+    réglage du nombre de cœurs ; classifieurs compatibles ; prédictions hors pli
+    identiques à scikit-learn \\
+  \code{test\_text\_columns.py} & 3 &
+    TargetEncoder sans cible ; choix automatique des colonnes et export Python
+    exécuté ; absence de colonne texte \\
+  \bottomrule
+\end{tabularx}
+\end{center}
+
+\paragraph{État de la vérification.} La partie analyse de l'import de scripts a été
+vérifiée sur les cas des tests et sur le projet de retards de vols. La lecture SQLite
+et l'équivalence des prédictions hors pli ont été vérifiées dans un environnement de
+test. La syntaxe de tous les fichiers Python et JavaScript a été contrôlée.
+L'exécution de la suite complète et l'essai de l'interface restent à faire sur la
+machine cible, où les dépendances seront installées par \code{uv}.
+
+% ===========================================================================
+\clearpage
+\section{Fichiers modifiés}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{6.4cm}rX}
+  \toprule
+  \textbf{Fichier} & \textbf{Lignes} & \textbf{Modification} \\
+  \midrule
+  \multicolumn{3}{l}{\emph{Nouveaux fichiers}} \\
+  \code{kataml/py\_import.py} & 1\,135 & import de scripts Python \\
+  \code{kataml/static/js/project.js} & 271 & fenêtre « Données et scripts » \\
+  \code{tests/test\_py\_import.py} & 199 & tests de l'import et des lecteurs \\
+  \code{tests/test\_text\_columns.py} & 80 & tests des encodeurs \\
+  \code{tests/test\_performance.py} & 51 & tests des performances \\
+  \midrule
+  \multicolumn{3}{l}{\emph{Fichiers existants} (lignes ajoutées / retirées)} \\
+  \code{kataml/nodes.py} & +326 / $-$11 & lecteurs Parquet / Excel et SQL, cœurs, encodeurs \\
+  \code{kataml/server.py} & +66 / 0 & routes d'import et de bibliothèque \\
+  \code{kataml/static/js/main.js} & +35 / $-$9 & bouton Données, dépôt, import \\
+  \code{kataml/\_\_main\_\_.py} & +23 / $-$1 & options de lancement (cœurs, cache) \\
+  \code{kataml/i18n.py} & +10 / $-$1 & traductions (nœuds, messages) \\
+  \code{kataml/static/js/api.js} & +6 / 0 & appels aux nouvelles routes \\
+  \code{kataml/static/js/inspector.js} & +6 / $-$3 & bouton Importer selon le lecteur \\
+  \code{kataml/nodes\_compose.py} & +3 / $-$2 & calcul sur plusieurs cœurs \\
+  \code{kataml/nodes\_explain.py} & +2 / $-$2 & calcul sur plusieurs cœurs \\
+  \code{pyproject.toml}, \code{requirements.txt} & +4 / 0 & dépendances pyarrow et openpyxl \\
+  \code{kataml/static/js/i18n.js} & --- & traductions de l'interface \\
+  \code{kataml/static/css/app.css} & --- & styles de la fenêtre « Données et scripts » \\
+  \code{kataml/static/index.html} & --- & bouton « Données » de la barre d'outils \\
+  \code{docs/fr}, \code{docs/en} & --- & barre d'outils, canevas, installation, historique \\
+  \bottomrule
+\end{tabularx}
+\end{center}
+
+% ===========================================================================
+\section{Perspectives}
+\label{sec:perspectives}
+
+\begin{itemize}
+  \item \textbf{Visualisation des réseaux de neurones.} KataML propose déjà
+        \code{MLPClassifier} et \code{MLPRegressor}, mais pas de vue du réseau. Un nœud
+        dédié afficherait l'architecture (couches, neurones, poids des connexions) et
+        la courbe de perte au fil des itérations.
+  \item \textbf{PyTorch et TensorFlow.} Grâce aux bibliothèques \code{skorch} et
+        \code{SciKeras}, qui donnent aux réseaux l'interface de scikit-learn, ces
+        réseaux pourraient être intégrés comme une extension optionnelle, avec calcul
+        sur le processeur graphique des Mac (MPS).
+  \item \textbf{Version portable pour macOS}, sur le modèle des versions Linux et
+        Windows.
+  \item \textbf{Intégration au projet} : ces modifications peuvent être proposées à
+        l'auteur de KataML par une demande de fusion sur GitLab, après exécution de la
+        suite de tests.
+\end{itemize}
+
+\appendix
+% ===========================================================================
+\section{Commandes utiles}
+
+\begin{lstlisting}[language=bash]
+cd ~/Documents/master/kataml-v0.5.8
+uv run python -m unittest discover -v tests     # suite de tests complète
+./kataml.sh                                      # lancement (navigateur : Cmd+Maj+R)
+./kataml.sh --jobs 4 --cache-mb 4096             # réglages de performance
+uv run python -m kataml run workflow.json --rapport rapport.html   # sans interface
+\end{lstlisting}
+
+\end{document}
