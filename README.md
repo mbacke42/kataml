@@ -2,7 +2,7 @@
 
 > **Fork non officiel.** KataML a été créé par **fredbl**, auteur et mainteneur du projet
 > d'origine : <https://gitlab.com/fredbl/kataml> (licence MIT). Ce dépôt n'est pas le
-> projet officiel : il contient des modifications réalisées par **VOTRE NOM**, étudiant en
+> projet officiel : il contient des modifications réalisées par Pape Ndiogou SEYE, étudiant en
 > master Statistique pour l'évaluation et la prévision (SEP) à l'Université de Reims
 > Champagne-Ardenne, à partir de la version 0.5.8. Pour la version officielle, les
 > versions portables et la documentation, reportez-vous au dépôt d'origine.
